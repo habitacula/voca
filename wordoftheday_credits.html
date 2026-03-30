@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word of the Day — Credits</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { background:#000; height:100%; }
+body {
+  background:#000 !important;
+  color:#e8e4dc;
+  font-family:'Cormorant Garamond',Georgia,serif;
+  height:100%;
+  overflow:hidden;
+}
+
+#fade-top {
+  position:fixed; top:0; left:0; right:0; height:110px;
+  background:linear-gradient(to bottom,#000 45%,transparent);
+  z-index:20; pointer-events:none;
+}
+#fade-bottom {
+  position:fixed; bottom:0; left:0; right:0; height:110px;
+  background:linear-gradient(to top,#000 45%,transparent);
+  z-index:20; pointer-events:none;
+}
+
+#stage {
+  position:fixed; inset:0; background:#000;
+  display:flex; justify-content:center; overflow:hidden;
+}
+#track {
+  position:absolute; width:100%; max-width:700px;
+  padding:0 36px; text-align:center; will-change:transform;
+}
+
+/* ── Title ── */
+.title-block { padding:80px 0 100px; }
+.title-main {
+  font-family:'IM Fell English',serif;
+  font-size:clamp(1.8rem,5vw,3rem); font-weight:400;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:#f0ebe0; margin-bottom:16px;
+}
+.title-sub {
+  font-size:clamp(0.75rem,2vw,0.95rem); font-weight:300;
+  font-style:italic; letter-spacing:0.22em;
+  color:#6a6050; text-transform:uppercase;
+}
+.title-rule {
+  width:100px; height:1px;
+  background:linear-gradient(90deg,transparent,#5a5040,transparent);
+  margin:24px auto;
+}
+.title-count {
+  font-size:0.75rem; letter-spacing:0.3em;
+  color:#3a3428; text-transform:uppercase; margin-top:10px;
+}
+
+/* ── Word block ── */
+.word-block { padding:52px 0; border-top:1px solid rgba(255,255,255,0.04); }
+.word-title {
+  font-family:'IM Fell English',serif;
+  font-size:clamp(2rem,6vw,3.4rem); font-weight:400;
+  letter-spacing:0.04em; color:#f5f0e8; line-height:1; margin-bottom:8px;
+}
+.word-pos {
+  font-size:0.7rem; letter-spacing:0.35em; text-transform:uppercase;
+  color:#4a4438; margin-bottom:10px; min-height:1em;
+}
+.word-pron {
+  font-style:italic; font-size:clamp(0.95rem,2.2vw,1.2rem);
+  font-weight:300; color:#8a8070; letter-spacing:0.06em; margin-bottom:20px;
+}
+.divider { width:36px; height:1px; background:#2a2520; margin:0 auto 22px; }
+
+.word-def-en {
+  font-size:clamp(1.05rem,2.5vw,1.25rem); font-weight:400;
+  color:#c8c4bc; line-height:1.8; margin-bottom:12px;
+  max-width:520px; margin-left:auto; margin-right:auto;
+}
+.word-def-ko {
+  font-size:clamp(1rem,2.2vw,1.15rem); font-weight:300;
+  color:#a09888; line-height:1.75; margin-bottom:24px;
+  max-width:520px; margin-left:auto; margin-right:auto;
+}
+
+/* ── Example — thicker, more readable ── */
+.example-wrap {
+  max-width:500px; margin:0 auto; padding:18px 26px;
+  border-left:1px solid #282420; border-right:1px solid #282420;
+}
+.example-en {
+  font-size:clamp(1rem,2.2vw,1.1rem);
+  font-style:italic; font-weight:400;
+  color:#b0a898; line-height:1.8; margin-bottom:10px;
+}
+.example-ko {
+  font-size:clamp(0.95rem,2vw,1.05rem); font-weight:400;
+  color:#8a8070; line-height:1.7;
+}
+
+/* ── Closing ── */
+.closing-block { padding:100px 0 60px; }
+.closing-line {
+  font-family:'IM Fell English',serif; font-size:1.1rem;
+  font-style:italic; color:#2a2820; letter-spacing:0.12em; margin-bottom:18px;
+}
+.closing-rule { width:50px; height:1px; background:#1e1c18; margin:0 auto 18px; }
+.closing-year { font-size:0.65rem; letter-spacing:0.38em; color:#1e1c18; text-transform:uppercase; }
+.end-spacer { height:100vh; background:#000; }
+
+/* ── Controls (always visible) ── */
+#controls {
+  position:fixed; bottom:0; left:0; right:0; z-index:30;
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:8px; padding:14px 20px 22px;
+  background:linear-gradient(to top,rgba(0,0,0,0.98) 60%,transparent);
+}
+.ctrl-btn {
+  font-family:'Cormorant Garamond',serif; font-size:0.72rem;
+  letter-spacing:0.16em; text-transform:uppercase;
+  color:#6a6458; background:transparent;
+  border:1px solid #2a2820; padding:7px 16px;
+  cursor:pointer; transition:color 0.2s,border-color 0.2s; white-space:nowrap;
+}
+.ctrl-btn:hover { color:#c8c4bc; border-color:#6a5f4a; }
+.ctrl-btn:active { opacity:0.7; }
+
+/* ── Selector overlay ── */
+#selector-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.97); z-index:50;
+  flex-direction:column; align-items:center;
+  padding:40px 24px; overflow-y:auto;
+}
+#selector-overlay.open { display:flex; }
+.sel-title {
+  font-family:'IM Fell English',serif; font-size:1.2rem;
+  letter-spacing:0.2em; color:#a09888; text-transform:uppercase; margin-bottom:8px;
+}
+.sel-sub { font-size:0.7rem; letter-spacing:0.2em; color:#3a3428; text-transform:uppercase; margin-bottom:28px; }
+.sel-rule { width:60px; height:1px; background:#2a2820; margin:0 auto 28px; }
+.chips-grid {
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:8px; max-width:680px; width:100%;
+}
+.chip {
+  font-family:'Cormorant Garamond',serif; font-size:0.85rem;
+  letter-spacing:0.08em; color:#7a7060;
+  border:1px solid #2a2820; padding:7px 16px; cursor:pointer;
+  transition:color 0.2s,border-color 0.2s,background 0.2s; white-space:nowrap;
+}
+.chip:hover { color:#f0ebe0; border-color:#6a5f4a; background:rgba(100,90,70,0.12); }
+.sel-close {
+  margin-top:32px; font-family:'Cormorant Garamond',serif;
+  font-size:0.72rem; letter-spacing:0.3em; text-transform:uppercase;
+  color:#3a3428; background:none; border:1px solid #2a2820;
+  padding:8px 24px; cursor:pointer; transition:color 0.2s;
+}
+.sel-close:hover { color:#a09888; }
+</style>
+</head>
+<body>
+
+<div id="fade-top"></div>
+<div id="fade-bottom"></div>
+
+<div id="stage">
+  <div id="track">
+    <div class="title-block">
+      <div class="title-sub">A Collection of</div>
+      <div class="title-rule"></div>
+      <div class="title-main">Word of the Day</div>
+      <div class="title-rule"></div>
+      <div class="title-sub">One Hundred Fifty-Eight Words Worth Knowing</div>
+      <div class="title-count">— 2025 · 2026 —</div>
+    </div>
+
+    <div id="word-list">
+<div class="word-block" id="word-0">
+  <div class="word-title">abdicate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/AB-dih-kayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To abdicate is to renounce one's throne, or to fail to fulfill a responsibility or duty.</div><div class="word-def-ko">권좌를 포기하다, 책임을 저버리다</div>
+  <div class="example-wrap"><div class="example-en">The king abdicated the throne in favor of his younger brother.</div><div class="example-ko">왕은 동생에게 왕위를 물려주기 위해 왕위를 포기했다.</div></div>
+</div>
+<div class="word-block" id="word-1">
+  <div class="word-title">abide</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/uh-BYDE/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">If someone cannot abide someone or something bad, unpleasant, etc., they cannot tolerate or accept that person or thing.</div><div class="word-def-ko">(주로 부정문에서) 나쁘거나 불쾌한 것을 참거나 용납할 수 없다; (규칙, 결정 등을) 이의 없이 받아들이다, 따르다.</div>
+  <div class="example-wrap"><div class="example-en">All employees must abide by the company's code of conduct to ensure a respectful workplace.</div><div class="example-ko">모든 직원은 존중받는 직장 환경을 보장하기 위해 회사의 행동 강령을 준수해야 합니다.</div></div>
+</div>
+<div class="word-block" id="word-2">
+  <div class="word-title">ad hoc</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/AD-HOCK/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Ad hoc describes something created or done for a particular purpose as necessary, without prior planning.</div><div class="word-def-ko">특정 목적을 위한 임시의</div>
+  <div class="example-wrap"><div class="example-en">The committee was formed on an ad hoc basis to address the sudden crisis.</div><div class="example-ko">위원회는 갑작스러운 위기에 대응하기 위해 임시로 구성되었다.</div></div>
+</div>
+<div class="word-block" id="word-3">
+  <div class="word-title">adulation</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/aj-uh-LAY-shun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Adulation is excessive admiration or praise, often to a degree that seems insincere.</div><div class="word-def-ko">과도한 칭송, 아첨</div>
+  <div class="example-wrap"><div class="example-en">The young pop star was overwhelmed by the adulation of her fans.</div><div class="example-ko">젊은 팝스타는 팬들의 열광적인 찬사에 압도되었다.</div></div>
+</div>
+<div class="word-block" id="word-4">
+  <div class="word-title">alacrity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ə-ˈla-krə-tē/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Alacrity means prompt, eager willingness to do something.</div><div class="word-def-ko">민첩한 기꺼움, 신속한 응낙</div>
+  <div class="example-wrap"><div class="example-en">She accepted the tough assignment with alacrity.</div><div class="example-ko">그녀는 어려운 과제를 기꺼이, 재빠르게 맡았다.</div></div>
+</div>
+<div class="word-block" id="word-5">
+  <div class="word-title">alchemy</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/AL-kuh-mee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Alchemy refers to a power or process that changes or transforms something in a mysterious or impressive way.</div><div class="word-def-ko">무언가를 신비롭거나 인상적인 방식으로 변화시키거나 변형시키는 힘 또는 과정을 의미합니다. (흔히 '연금술'로 번역됩니다.)</div>
+  <div class="example-wrap"><div class="example-en">Through pure musical alchemy, the band turned the crowd's awkward</div><div class="example-ko">밴드는 순수한 음악적 연금술을 통해 군중의 어색한 침묵을 열광의 함성으로 바꾸어 놓았습니다.</div></div>
+</div>
+<div class="word-block" id="word-6">
+  <div class="word-title">alleviate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/uh-LEE-vee-ayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To alleviate something is to make it less painful, difficult, or severe.</div><div class="word-def-ko">(고통, 어려움, 심각성 등을) 덜다, 완화하다, 경감하다.</div>
+  <div class="example-wrap"><div class="example-en">Drinking warm tea with honey can help alleviate a sore throat.</div><div class="example-ko">꿀을 넣은 따뜻한 차를 마시는 것은 인후통을 완화하는 데 도움이 될 수 있다.</div></div>
+</div>
+<div class="word-block" id="word-7">
+  <div class="word-title">amalgamate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/uh-MAL-guh-mayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">"to unite (two or more things) into one thing."</div><div class="word-def-ko">둘 이상의 것을 하나로 합치다, 통합하다.</div>
+  <div class="example-wrap"><div class="example-en">The two small tech companies decided to amalgamate to better compete with larger corporations.</div><div class="example-ko">두 소규모 기술 회사는 대기업과 더 잘 경쟁하기 위해 합병하기로 결정했다.</div></div>
+</div>
+<div class="word-block" id="word-8">
+  <div class="word-title">amortize</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/AM-er-tyze/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To amortize is to gradually pay off a debt over a period of time through regular payments.</div><div class="word-def-ko">대출금을 분할 상환하다, 감가상각하다</div>
+  <div class="example-wrap"><div class="example-en">The company chose to amortize the loan over twenty years to reduce monthly payments.</div><div class="example-ko">회사는 월 상환액을 줄이기 위해 대출을 20년에 걸쳐 분할 상환하기로 했다.</div></div>
+</div>
+<div class="word-block" id="word-9">
+  <div class="word-title">apotheosis</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/uh-pah-thee-OH-sis/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Apotheosis refers to the highest point in the development of something, or the elevation of someone to divine status.</div><div class="word-def-ko">절정, 완벽한 본보기</div>
+  <div class="example-wrap"><div class="example-en">The symphony was considered the apotheosis of his composing career.</div><div class="example-ko">그 교향곡은 그의 작곡 경력의 정점으로 여겨졌다.</div></div>
+</div>
+<div class="word-block" id="word-10">
+  <div class="word-title">apropos</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ap-ruh-POH/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Apropos means with reference to something, or very appropriate and relevant to a situation.</div><div class="word-def-ko">적절한, 알맞은; (전치사) ~에 관하여</div>
+  <div class="example-wrap"><div class="example-en">His comment about teamwork was quite apropos given the recent conflicts in the office.</div><div class="example-ko">팀워크에 대한 그의 발언은 최근 사무실 내 갈등을 고려할 때 매우 적절했다.</div></div>
+</div>
+<div class="word-block" id="word-11">
+  <div class="word-title">arbitrary</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/AHR-buh-trair-ee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Arbitrary describes something that is not planned or chosen for a particular reason, is not based on reason or evidence, or is done without concern for what is fair or right.</div><div class="word-def-ko">특정한 이유 없이 계획되거나 선택되지 않고, 이성이나 증거에 근거하지 않거나, 공정함이나 권리를 고려하지 않고 행해지는 것을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The dictator was known for making arbitrary decisions that instilled fear in the public.</div><div class="example-ko">그 독재자는 대중에게 공포심을 심어주는 임의적인 결정을 내리는 것으로 알려져 있었습니다.</div></div>
+</div>
+<div class="word-block" id="word-12">
+  <div class="word-title">aspersions</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ə-ˈspur-zhənz/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">intended to injure someone's character.</div><div class="word-def-ko">비난, 명예훼손</div>
+  <div class="example-wrap"><div class="example-en">He cast aspersions on her integrity without any proof.</div><div class="example-ko">그는 아무 증거 없이 그녀의 청렴성을 의심했다.</div></div>
+</div>
+<div class="word-block" id="word-13">
+  <div class="word-title">astrolabe</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/-struh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">An astrolabe is a compact instrument used to observe and calculate the position of celestial bodies before the invention of the sextant.</div><div class="word-def-ko">아스트롤라베(천체 관측 의기)는 육분의가 발명되기 전, 천체의 위치를 관측하고 계산하는 데 사용된 소형 기구입니다.</div>
+  <div class="example-wrap"><div class="example-en">Ancient mariners relied on the astrolabe to navigate the vast oceans by</div><div class="example-ko">고대 선원들은 별의 고도를 측정하여 넓은 바다를 항해하기 위해 아스트롤라베에 의존했습니다.</div></div>
+</div>
+<div class="word-block" id="word-14">
+  <div class="word-title">audacious</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/aw-DAY-shus/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Audacious describes someone fearlessly bold or willing to take</div><div class="word-def-ko">대담한, 뻔뻔할 정도로 용감한</div>
+  <div class="example-wrap"><div class="example-en">The team's audacious plan to colonize Mars captured global attention.</div><div class="example-ko">그 팀의 화성 식민지화 계획은 전 세계의 관심을 끌었다.</div></div>
+</div>
+<div class="word-block" id="word-15">
+  <div class="word-title">besmirch</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/bih-SMERCH/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To besmirch someone is to damage or destroy their reputation by saying unpleasant things about them.</div><div class="word-def-ko">평판이나 명예를 더럽히다</div>
+  <div class="example-wrap"><div class="example-en">The false accusations were designed to besmirch his good name.</div><div class="example-ko">그 거짓 고발은 그의 명성을 더럽히기 위한 것이었다.</div></div>
+</div>
+<div class="word-block" id="word-16">
+  <div class="word-title">besotted</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/bih-SAH-tud/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Besotted describes someone who is so strongly attracted to someone or something that they cannot think clearly.</div><div class="word-def-ko">사랑에 푹 빠진</div>
+  <div class="example-wrap"><div class="example-en">He was so besotted with her that he forgot all his responsibilities.</div><div class="example-ko">그는 그녀에게 완전히 빠져들어 모든 책임을 잊어버렸다.</div></div>
+</div>
+<div class="word-block" id="word-17">
+  <div class="word-title">bespoke</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/bih-SPOHK/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Bespoke describes something made to a customer's individual specifications, especially clothing.</div><div class="word-def-ko">맞춤형, 특정 개인의 요구에 맞춘</div>
+  <div class="example-wrap"><div class="example-en">He wore a bespoke suit that had been tailored specifically for his body.</div><div class="example-ko">그는 자신의 체형에 맞춰 맞춤 제작된 정장을 입었다.</div></div>
+</div>
+<div class="word-block" id="word-18">
+  <div class="word-title">bloviate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/BLOH-vee-ayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To speak or write in an arrogant tone and with more words than are necessary.</div><div class="word-def-ko">거만한 어조로 필요 이상으로 장황하게 말하거나 글을 쓰다.</div>
+  <div class="example-wrap"><div class="example-en">The politician was known to bloviate for hours, yet say nothing of substance.</div><div class="example-ko">그 정치인은 몇 시간이고 장황하게 연설했지만, 실속 있는 내용은 전혀 없는 것으로 유명했다.</div></div>
+</div>
+<div class="word-block" id="word-19">
+  <div class="word-title">brackish</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/BRACK-ish/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Meaning "somewhat salty," usually describes water or bodies of water, such as rivers, lakes, and estuaries.</div><div class="word-def-ko">'약간 짠'이라는 뜻으로, 주로 강이나 호수, 강과 바다가 만나는 하구(estuary)와 같은 물이나 수역을 묘사할 때 쓰입니다. (또한 맛이 없거나 불쾌하다는 의미로도 사용됩니다.)</div>
+  <div class="example-wrap"><div class="example-en">Mangroves thrive in brackish water, where the fresh river water mixes</div><div class="example-ko">맹그로브는 강물과 바닷물이 섞이는 염분이 있는 물에서 잘 자랍니다.</div></div>
+</div>
+<div class="word-block" id="word-20">
+  <div class="word-title">bravado</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/bruh-VAH-doh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Bravado refers to confident or brave talk or behavior that is intended to impress other people.</div><div class="word-def-ko">다른 사람들에게 깊은 인상을 주기 위한 자신만만하거나 용감한 척하는 말이나 행동 (허세).</div>
+  <div class="example-wrap"><div class="example-en">Despite his outward bravado, he was trembling with fear inside regarding</div><div class="example-ko">겉으로는 허세를 부렸지만, 그는 다가오는 면접 생각에 속으로 두려움에 떨고 있었다.</div></div>
+</div>
+<div class="word-block" id="word-21">
+  <div class="word-title">brevity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/BREH-vuh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Brevity means using few words to express much, or shortness in time.</div><div class="word-def-ko">간결함, 짧음</div>
+  <div class="example-wrap"><div class="example-en">Brevity is key in executive summaries.</div><div class="example-ko">경영 요약서에서 간결함은 핵심이다.</div></div>
+</div>
+<div class="word-block" id="word-22">
+  <div class="word-title">bromide</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/BROH-myde/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A bromide is a statement intended to make someone feel happier or calmer, but too dull and unoriginal to be effective.</div><div class="word-def-ko">사람을 위로하거나 진정시키려는 의도지만, 너무 진부하고 독창성이 없어 효과가 없는 말.</div>
+  <div class="example-wrap"><div class="example-en">Tired of hearing the same old political bromides, the citizens demanded concrete action instead of empty promises.</div><div class="example-ko">낡아빠진 정치적 상투어구에 싫증이 난 시민들은, 공허한 약속 대신 구체적인 행동을 요구했습니다.</div></div>
+</div>
+<div class="word-block" id="word-23">
+  <div class="word-title">cadence</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/KAY-dunss/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Cadence refers to a rhythmic sequence or flow of sounds, or the rise and fall of a voice in speech.</div><div class="word-def-ko">리듬감 있는 반복적 움직임이나 억양</div>
+  <div class="example-wrap"><div class="example-en">The poet's cadence was so musical that the audience was completely captivated.</div><div class="example-ko">시인의 리듬감 있는 낭독은 청중을 완전히 사로잡았다.</div></div>
+</div>
+<div class="word-block" id="word-24">
+  <div class="word-title">cadge</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/KAJ/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To cadge is to ask someone for something in a way that takes advantage of their generosity.</div><div class="word-def-ko">누군가를 설득하여 무언가를 공짜로 얻어내다</div>
+  <div class="example-wrap"><div class="example-en">He was always trying to cadge a free meal from his more successful friends.</div><div class="example-ko">그는 항상 더 성공한 친구들에게서 공짜 식사를 얻으려 했다.</div></div>
+</div>
+<div class="word-block" id="word-25">
+  <div class="word-title">cajole</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/kuh-JOHL/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To cajole someone is to use flattery or gentle urging to persuade them to do something or to give you something.</div><div class="word-def-ko">아첨이나 부드러운 권유로 누군가를 설득하여 무언가를 하거나 얻어내는 것.</div>
+  <div class="example-wrap"><div class="example-en">The child tried to cajole his mother into buying him a new toy by promising to be good.</div><div class="example-ko">그 아이는 착하게 굴겠다고 약속하며 엄마를 구슬려 새 장난감을 사달라고 했다.</div></div>
+</div>
+<div class="word-block" id="word-26">
+  <div class="word-title">canoodle</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/kuh-NOO-dul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To canoodle is to kiss and cuddle amorously with someone.</div><div class="word-def-ko">다정하게 껴안고 입맞추다</div>
+  <div class="example-wrap"><div class="example-en">The couple were canoodling in the corner, oblivious to everyone around them.</div><div class="example-ko">그 커플은 주변 사람들을 전혀 의식하지 못한 채 구석에서 애정을 나누고 있었다.</div></div>
+</div>
+<div class="word-block" id="word-27">
+  <div class="word-title">charisma</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/kuh-RIZ-muh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Charisma is a compelling attractiveness or charm that can inspire devotion in others.</div><div class="word-def-ko">사람을 매료시키는 특별한 매력</div>
+  <div class="example-wrap"><div class="example-en">Her natural charisma made her the most popular candidate in the election.</div><div class="example-ko">그녀의 타고난 카리스마는 선거에서 그녀를 가장 인기 있는 후보로 만들었다.</div></div>
+</div>
+<div class="word-block" id="word-28">
+  <div class="word-title">cloying</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/KLOY-ing/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Cloying is used disapprovingly to describe something that is too sweet, pleasant, or sentimental.</div><div class="word-def-ko">지나치게 달거나, 상냥하거나, 감상적이어서 불쾌감을 주거나 질리게 하는 것을 나타냅니다.</div>
+  <div class="example-wrap"><div class="example-en">The movie's ending was so cloying that it felt more like a cheesy</div><div class="example-ko">그 영화의 결말은 지나치게 감상적이고 오글거려서 진지한 드라마라기보다는 유치한 광고처럼 느껴졌다.</div></div>
+</div>
+<div class="word-block" id="word-29">
+  <div class="word-title">coalesce</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/koh-uh-LESS/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Coalesce means to unite or merge into a single entity.</div><div class="word-def-ko">합쳐지다, 융합되다</div>
+  <div class="example-wrap"><div class="example-en">The club's projects gave students a goal to coalesce around.</div><div class="example-ko">동아리의 프로젝트는 학생들을 하나로 묶는 목표가 되었다.</div></div>
+</div>
+<div class="word-block" id="word-30">
+  <div class="word-title">collude</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/kuh-LOOD/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To collude is to cooperate secretly or illegally in order to deceive or cheat others.</div><div class="word-def-ko">불법적인 일을 위해 비밀리에 공모하다</div>
+  <div class="example-wrap"><div class="example-en">The two companies were found to have colluded to fix prices in the market.</div><div class="example-ko">두 회사는 시장에서 가격을 담합하기 위해 공모한 것으로 밝혀졌다.</div></div>
+</div>
+<div class="word-block" id="word-31">
+  <div class="word-title">conciliatory</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/kən-ˈsil-yə-ˌtȯr-ē/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Conciliatory describes words or actions meant to calm anger or repair</div><div class="word-def-ko">화해를 위한, 달래는</div>
+  <div class="example-wrap"><div class="example-en">Her conciliatory smile helped ease the tension in the room.</div><div class="example-ko">그녀의 화해적인 미소가 방 안의 긴장을 누그러뜨렸다.</div></div>
+</div>
+<div class="word-block" id="word-32">
+  <div class="word-title">congruous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/KAHNG-groo-us/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Congruous describes something that is in agreement or harmony with its surroundings or other things.</div><div class="word-def-ko">조화로운, 일치하는</div>
+  <div class="example-wrap"><div class="example-en">The modern building was not congruous with the historic neighborhood around it.</div><div class="example-ko">그 현대식 건물은 주변의 역사적인 동네와 어울리지 않았다.</div></div>
+</div>
+<div class="word-block" id="word-33">
+  <div class="word-title">conversant</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/kun-VER-sunt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Describes someone who has knowledge of or experience with something.</div><div class="word-def-ko">어떤 주제나 분야에 대해 지식이 있거나 경험이 있어 정통한 (잘 알고 있는).</div>
+  <div class="example-wrap"><div class="example-en">She is thoroughly conversant with the company's new safety regulations.</div><div class="example-ko">그녀는 회사의 새로운 안전 규정에 대해 완전히 정통해 있다.</div></div>
+</div>
+<div class="word-block" id="word-34">
+  <div class="word-title">cornucopia</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/kor-nuh-KOH-pee-uh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">The word cornucopia is today more often encountered in its metaphorical use referring to an overflowing abundance, or to a seemingly inexhaustible amount of something.</div><div class="word-def-ko">오늘날 'cornucopia'라는 단어는 넘쳐나는 풍요로움이나 고갈되지 않을 것처럼 보이는 엄청난 양을 비유적으로 표현하는 데 더 자주 사용됩니다.</div>
+  <div class="example-wrap"><div class="example-en">The new streaming service offers a cornucopia of movies and TV shows for every taste.</div><div class="example-ko">그 새로운 스트리밍 서비스는 모든 취향에 맞는 영화와 TV 프로그램을 풍부하게 제공합니다.</div></div>
+</div>
+<div class="word-block" id="word-35">
+  <div class="word-title">crepuscular</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/krih-PUHSS-kyuh-ler/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Crepuscular relates to twilight, or describes animals that are active during the periods of dawn and dusk.</div><div class="word-def-ko">황혼과 관련된</div>
+  <div class="example-wrap"><div class="example-en">Deer are crepuscular animals, most often seen grazing at dawn or dusk.</div><div class="example-ko">사슴은 새벽이나 황혼 무렵에 가장 자주 풀을 뜯는 박명박모 동물이다.</div></div>
+</div>
+<div class="word-block" id="word-36">
+  <div class="word-title">crucible</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/KROO-suh-bul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A pot in which metals or other substances are heated to a very high temperature or melted; also, a difficult test or challenge.</div><div class="word-def-ko">금속이나 다른 물질을 매우 높은 온도로 가열하거나 녹이는 데 쓰는 냄비; 또는 혹독한 시련이나 시험.</div>
+  <div class="example-wrap"><div class="example-en">The young leader's character was forged in the crucible of political crisis.</div><div class="example-ko">그 젊은 지도자의 인격은 정치적 위기라는 혹독한 시련 속에서 형성되었다.</div></div>
+</div>
+<div class="word-block" id="word-37">
+  <div class="word-title">culminate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/KUL-muh-nayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To culminate means to reach a climax or point of highest development.</div><div class="word-def-ko">절정에 이르다, 결국 ~로 귀결되다</div>
+  <div class="example-wrap"><div class="example-en">Years of hard training culminated in her winning the gold medal.</div><div class="example-ko">수년간의 혹독한 훈련이 그녀의 금메달 획득으로 결실을 맺었다.</div></div>
+</div>
+<div class="word-block" id="word-38">
+  <div class="word-title">decorous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/DECK-er-us/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Decorous is a formal adjective used to describe an attitude or behavior characterized by propriety and good taste.</div><div class="word-def-ko">예의와 품격을 갖춘 태도나 행동을 묘사할 때 쓰이는 격식 있는 형용사입니다.</div>
+  <div class="example-wrap"><div class="example-en">Despite the heated disagreement, both sides managed to keep the debate</div><div class="example-ko">격렬한 의견 차이에도 불구하고, 양측은 토론을 예의 바르고 정중하게 유지해냈습니다.</div></div>
+</div>
+<div class="word-block" id="word-39">
+  <div class="word-title">deem</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/DEEM/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To deem something is to regard or consider it in a specified way.</div><div class="word-def-ko">생각하다, 판단하다</div>
+  <div class="example-wrap"><div class="example-en">The judge deemed the evidence insufficient to support a conviction.</div><div class="example-ko">판사는 그 증거가 유죄 판결을 뒷받침하기에 불충분하다고 판단했다.</div></div>
+</div>
+<div class="word-block" id="word-40">
+  <div class="word-title">defenestration</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/dee-feh-nuh-STRAY-shun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Defenestration literally means "throwing out of a window," and</div><div class="word-def-ko">창문 밖으로 던지기; (비유적으로) 내쫓기</div>
+  <div class="example-wrap"><div class="example-en">The protest led to the defenestration of the unpopular mayor.</div><div class="example-ko">그 시위로 인해 인기가 없던 시장이 자리에서 쫓겨났다.</div></div>
+</div>
+<div class="word-block" id="word-41">
+  <div class="word-title">delegate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/DEL-uh-gayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To delegate something (such as control, responsibility, authority, or a job or duty) is to trust someone else with it.</div><div class="word-def-ko">(책임, 권한, 업무 등을) 다른 사람에게 믿고 맡기다[위임하다].</div>
+  <div class="example-wrap"><div class="example-en">A good manager knows how to effectively delegate tasks to team members</div><div class="example-ko">훌륭한 관리자는 생산성을 높이기 위해 팀원들에게 업무를 효과적으로 위임하는 법을 안다.</div></div>
+</div>
+<div class="word-block" id="word-42">
+  <div class="word-title">deliquesce</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/del-ih-KWESS/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">to dissolve or melt away</div><div class="word-def-ko">녹거나 용해되어 없어지다</div>
+  <div class="example-wrap"><div class="example-en">The sugar cube, left out on the humid counter, began to deliquesce into a sticky puddle.</div><div class="example-ko">습한 조리대 위에 놓인 각설탕이 끈적한 웅덩이로 녹아내리기 시작했다.</div></div>
+</div>
+<div class="word-block" id="word-43">
+  <div class="word-title">desolate</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/DESS-uh-lut/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Describes places that are deserted or barren; can also mean "joyless" or "gloomy."</div><div class="word-def-ko">사람이나 동식물이 없어 황량하고 적막한; 기쁨이 없고 음울한 상태를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">After the gold rush ended, it became a desolate ghost town with only the wind whistling through empty buildings.</div><div class="example-ko">골드러시가 끝난 후, 그곳은 텅 빈 건물들 사이로 바람 소리만 들리는 황량한 유령 도시가 되었습니다.</div></div>
+</div>
+<div class="word-block" id="word-44">
+  <div class="word-title">diaphanous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/dye-AF-uh-nus/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Diaphanous is a formal word used to describe fabric of a texture so fine that one can see through it.</div><div class="word-def-ko">아주 얇고 섬세해서 뒤가 비칠 정도로 투명한 천이나 질감을 묘사하는 격식 있는 단어입니다.</div>
+  <div class="example-wrap"><div class="example-en">The dragonfly's diaphanous wings shimmered beautifully in the morning sunlight.</div><div class="example-ko">잠자리의 아주 얇고 투명한 날개가 아침 햇살을 받아 아름답게 반짝였습니다.</div></div>
+</div>
+<div class="word-block" id="word-45">
+  <div class="word-title">disheveled</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/dih-SHEV-uld/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A disheveled person or thing is not neat or tidy.</div><div class="word-def-ko">사람이나 사물이 단정하지 않거나 헝클어진 상태를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">After running through the heavy rain without an umbrella, she walked</div><div class="example-ko">우산 없이 폭우 속을 달린 후, 그녀는 완전히 헝클어진 모습으로 사무실에 걸어 들어왔다.</div></div>
+</div>
+<div class="word-block" id="word-46">
+  <div class="word-title">doughty</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/DOW-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Doughty is a word with an old-fashioned flair used to describe someone who is brave, strong, and determined.</div><div class="word-def-ko">용감하고, 강하며, 결단력 있는 사람을 묘사하는 데 사용되는 고풍스러운 느낌의 단어.</div>
+  <div class="example-wrap"><div class="example-en">The doughty little startup challenged the industry giant and eventually won the market share.</div><div class="example-ko">그 용맹한 작은 스타트업은 업계의 거물에게 도전하여 결국 시장 점유율을 차지했습니다.</div></div>
+</div>
+<div class="word-block" id="word-47">
+  <div class="word-title">dross</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/DRAHSS/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Dross refers to something regarded as worthless rubbish, or the scum that forms on molten metal.</div><div class="word-def-ko">가치가 낮거나 품질이 저하된 것, 불순물</div>
+  <div class="example-wrap"><div class="example-en">After the editing process, most of what remained was pure dross.</div><div class="example-ko">편집 과정 후 남은 것의 대부분은 완전한 쓰레기였다.</div></div>
+</div>
+<div class="word-block" id="word-48">
+  <div class="word-title">eccentric</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ik-SEN-trik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Eccentric usually describes people and things that deviate from conventional or accepted usage or behavior, especially in odd or whimsical ways.</div><div class="word-def-ko">특히 이상하거나 엉뚱한 방식으로 관습적이거나 통용되는 용법이나 행동에서 벗어나는 것을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The old mansion was filled with the eccentric inventions of its former owner.</div><div class="example-ko">그 낡은 대저택은 이전 주인의 기이한 발명품들로 가득 차 있었습니다.</div></div>
+</div>
+<div class="word-block" id="word-49">
+  <div class="word-title">elicit</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/ih-LISS-it/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To get (a response, information, etc.) from someone.</div><div class="word-def-ko">누군가로부터 (반응, 정보 등을) 끌어내다 또는 유도해 내다.</div>
+  <div class="example-wrap"><div class="example-en">The comedian's joke failed to elicit a single laugh from the audience.</div><div class="example-ko">그 코미디언의 농담은 관객들로부터 단 한 번의 웃음도 이끌어내지 못했다.</div></div>
+</div>
+<div class="word-block" id="word-50">
+  <div class="word-title">emancipation</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ih-man-suh-PAY-shun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Emancipation is the act or process of being freed from restriction,</div><div class="word-def-ko">해방, 자유화</div>
+  <div class="example-wrap"><div class="example-en">The Emancipation Proclamation marked a turning point in U.S. history.</div><div class="example-ko">노예해방 선언은 미국 역사에서 전환점이었다.</div></div>
+</div>
+<div class="word-block" id="word-51">
+  <div class="word-title">eminently</div>
+  <div class="word-pos">adverb</div>
+  <div class="word-pron">/EM-uh-nunt-lee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Eminently means to a notable degree; used to emphasize a positive quality.</div><div class="word-def-ko">대단히, 탁월하게, 매우</div>
+  <div class="example-wrap"><div class="example-en">She was eminently qualified for the senior research position.</div><div class="example-ko">그녀는 수석 연구직에 매우 적합한 자격을 갖추고 있었다.</div></div>
+</div>
+<div class="word-block" id="word-52">
+  <div class="word-title">encapsulate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/in-KAP-suh-layt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To encapsulate is to express the essential features of something succinctly, or to enclose in a capsule.</div><div class="word-def-ko">핵심을 요약하거나 집약하다</div>
+  <div class="example-wrap"><div class="example-en">The documentary encapsulates the struggles of an entire generation in just ninety minutes.</div><div class="example-ko">그 다큐멘터리는 90분 만에 한 세대 전체의 고난을 압축해서 담아낸다.</div></div>
+</div>
+<div class="word-block" id="word-53">
+  <div class="word-title">endemic</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/en-DEM-ik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Endemic describes something regularly found among particular people or in a certain area, especially a disease.</div><div class="word-def-ko">특정 지역 고유의, 고착된</div>
+  <div class="example-wrap"><div class="example-en">Corruption had become endemic in the region's political institutions.</div><div class="example-ko">부패는 그 지역의 정치 기관에 만연해 있었다.</div></div>
+</div>
+<div class="word-block" id="word-54">
+  <div class="word-title">enigmatic</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/en-ig-MAT-ik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Something or someone described as enigmatic is mysterious and difficult to understand.</div><div class="word-def-ko">어떤 사람이나 사물이 신비롭고 이해하기 어려워 수수께끼 같음을 나타냅니다.</div>
+  <div class="example-wrap"><div class="example-en">The Mona Lisa is famous for her enigmatic smile, which has puzzled art</div><div class="example-ko">모나리자는 수 세기 동안 예술 애호가들을 헷갈리게 만든, 그 수수께끼 같은 미소로 유명합니다.</div></div>
+</div>
+<div class="word-block" id="word-55">
+  <div class="word-title">ephemeral</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ih-FEM-uh-rul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Something described as ephemeral lasts only for a very short time.</div><div class="word-def-ko">아주 짧은 시간 동안만 지속되는 것, 즉 덧없거나 수명이 짧은 것을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The beauty of cherry blossoms lies in their ephemeral nature, blooming</div><div class="example-ko">벚꽃의 아름다움은 며칠 동안만 피었다가 지는 그 덧없는 본질에 있습니다.</div></div>
+</div>
+<div class="word-block" id="word-56">
+  <div class="word-title">Erin go bragh</div>
+  <div class="word-pos">phrase</div>
+  <div class="word-pron">/air-un-guh-BRAW/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Erin go bragh is an Irish phrase that means "Ireland forever."</div><div class="word-def-ko">"아일랜드여 영원하라"라는 뜻을 가진 아일랜드어 관용구입니다.</div>
+  <div class="example-wrap"><div class="example-en">The crowd erupted in cheers of "Erin go bragh!" as the St. Patrick's Day parade passed by.</div><div class="example-ko">성 패트릭의 날 퍼레이드가 지나가자 군중들은 "아일랜드여 영원하라!"라고 환호성을 질렀습니다.</div></div>
+</div>
+<div class="word-block" id="word-57">
+  <div class="word-title">espouse</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/ih-SPOWZ/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To espouse an ideology, belief, etc., is to take it up and support it as a cause.</div><div class="word-def-ko">(이념이나 신념 등을) 받아들이고 지지하다, 옹호하다.</div>
+  <div class="example-wrap"><div class="example-en">The candidate used the debate as an opportunity to espouse his plans for</div><div class="example-ko">그 후보자는 토론회를 자신의 경제 개혁안을 옹호하는 기회로 삼았다.</div></div>
+</div>
+<div class="word-block" id="word-58">
+  <div class="word-title">euphoria</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/yoo-ˈFOR-ee-ə/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Euphoria is an intense state of joy or excitement.</div><div class="word-def-ko">큰 기쁨, 희열</div>
+  <div class="example-wrap"><div class="example-en">After winning the game, the team was filled with euphoria.</div><div class="example-ko">경기에서 이긴 뒤 팀은 희열로 가득 찼다.</div></div>
+</div>
+<div class="word-block" id="word-59">
+  <div class="word-title">eureka</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/yoo-REE-kuh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Eureka is an exclamation used to celebrate a discovery, or an adjective describing a sudden triumphant moment of discovery.</div><div class="word-def-ko">갑작스러운 발견의 순간</div>
+  <div class="example-wrap"><div class="example-en">After weeks of failed experiments, she finally had her eureka moment in the lab.</div><div class="example-ko">수주간의 실패한 실험 끝에, 그녀는 마침내 실험실에서 깨달음의 순간을 맞이했다.</div></div>
+</div>
+<div class="word-block" id="word-60">
+  <div class="word-title">exculpatory</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/adjective/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Something described as exculpatory serves to prove that someone is not guilty of doing something wrong.</div><div class="word-def-ko">어떤 사람이 잘못한 일이 없다는 것을 증명하는, 무죄를 입증하는.</div>
+  <div class="example-wrap"><div class="example-en">The defense team hoped the newly discovered email would provide the exculpatory evidence needed to free their client.</div><div class="example-ko">변호인단은 새로 발견된 이메일이 의뢰인의 무죄를 입증하는 데 필요한 증거가 되기를 바랐습니다.</div></div>
+</div>
+<div class="word-block" id="word-61">
+  <div class="word-title">exhilarate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/ig-ZIL-uh-rayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To exhilarate is to make someone feel very happy, animated, or elated.</div><div class="word-def-ko">매우 기쁘고 신나게 하다</div>
+  <div class="example-wrap"><div class="example-en">The view from the mountaintop exhilarated the hikers after their long climb.</div><div class="example-ko">긴 등반 후 산 정상에서 바라본 경치는 등산객들을 활기차게 했다.</div></div>
+</div>
+<div class="word-block" id="word-62">
+  <div class="word-title">febrile</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/FEB-ryle/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Febrile means having or showing the symptoms of a fever, or characterised by a great deal of nervous excitement.</div><div class="word-def-ko">열이 나는; 과열된, 열광적인</div>
+  <div class="example-wrap"><div class="example-en">There was a febrile atmosphere in the trading room as the stock prices began to crash.</div><div class="example-ko">주가가 폭락하기 시작하자 거래실에는 긴장된 분위기가 감돌았다.</div></div>
+</div>
+<div class="word-block" id="word-63">
+  <div class="word-title">fidelity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/fuh-DELL-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Fidelity means loyalty and devotion to someone or something, or accuracy</div><div class="word-def-ko">충실, 정확성</div>
+  <div class="example-wrap"><div class="example-en">Her fidelity to her values never wavered, even in hardship.</div><div class="example-ko">그녀는 어려움 속에서도 자신의 가치에 충실했다.</div></div>
+</div>
+<div class="word-block" id="word-64">
+  <div class="word-title">fiduciary</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/fuh-DOO-shee-air-ee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Fiduciary is a formal word describing something relating to or involving trust, such as the trust between a customer and a professional.</div><div class="word-def-ko">고객과 전문가 사이의 관계처럼, 신뢰와 관련되거나 신뢰를 포함하는 상황을 묘사하는 격식 있는 단어입니다. (주로 '수탁자의', '신탁의'라는 의미로 쓰입니다.)</div>
+  <div class="example-wrap"><div class="example-en">Financial advisors have a fiduciary duty to act in the best interests of</div><div class="example-ko">재정 고문들은 고객의 최선의 이익을 위해 행동해야 할 수탁 의무가 있습니다.</div></div>
+</div>
+<div class="word-block" id="word-65">
+  <div class="word-title">fiscal</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/FISS-kul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Fiscal relates to government revenue, especially taxes, or to financial matters in general.</div><div class="word-def-ko">국가 재정이나 자금 관리와 관련된</div>
+  <div class="example-wrap"><div class="example-en">The government announced new fiscal policies aimed at reducing the national deficit.</div><div class="example-ko">정부는 국가 적자를 줄이기 위한 새로운 재정 정책을 발표했다.</div></div>
+</div>
+<div class="word-block" id="word-66">
+  <div class="word-title">foray</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/FOR-ay/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A foray is a sudden attack or incursion into enemy territory, or a first attempt at a new activity.</div><div class="word-def-ko">새로운 분야로의 첫 시도</div>
+  <div class="example-wrap"><div class="example-en">Her foray into the world of high fashion was both exciting and intimidating.</div><div class="example-ko">하이패션 세계로의 그녀의 첫 도전은 설레면서도 두려운 경험이었다.</div></div>
+</div>
+<div class="word-block" id="word-67">
+  <div class="word-title">fortitude</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ˈfɔːr-tɪ-tuːd/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Fortitude means mental or emotional strength that allows someone to face</div><div class="word-def-ko">용기, 인내</div>
+  <div class="example-wrap"><div class="example-en">She showed remarkable fortitude during her long illness.</div><div class="example-ko">그녀는 긴 투병 기간에도 놀라운 인내심을 보였다.</div></div>
+</div>
+<div class="word-block" id="word-68">
+  <div class="word-title">fortuitous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/for-TOO-uh-tus/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Fortuitous describes something happening by chance, especially a lucky chance.</div><div class="word-def-ko">운 좋게 우연히 일어난</div>
+  <div class="example-wrap"><div class="example-en">It was entirely fortuitous that she happened to be at the right place at the right time.</div><div class="example-ko">그녀가 딱 맞는 시간에 딱 맞는 장소에 있었던 것은 전적으로 행운이었다.</div></div>
+</div>
+<div class="word-block" id="word-69">
+  <div class="word-title">frenetic</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/frih-NET-ik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Frenetic describes activity that is fast and energetic in a rather wild and uncontrolled way.</div><div class="word-def-ko">열광, 활동, 혼란으로 가득 찬 상태</div>
+  <div class="example-wrap"><div class="example-en">The frenetic pace of city life was exhausting for someone raised in the countryside.</div><div class="example-ko">도시 생활의 정신없는 속도는 시골에서 자란 사람에게 버거웠다.</div></div>
+</div>
+<div class="word-block" id="word-70">
+  <div class="word-title">frolic</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/ˈfrä-lik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Frolic means to move or play in a lively, carefree, or joyful way.</div><div class="word-def-ko">즐겁게 뛰놀다</div>
+  <div class="example-wrap"><div class="example-en">Children frolicked in the snow after the storm.</div><div class="example-ko">폭풍이 지난 뒤 아이들이 눈밭에서 뛰놀았다.</div></div>
+</div>
+<div class="word-block" id="word-71">
+  <div class="word-title">frowsy</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/FROW-zee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Something described as frowsy has a messy or dirty appearance.</div><div class="word-def-ko">지저분하거나 불결한 외관, 혹은 단정치 못한 모습을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">After sleeping in her clothes all night, she looked quite frowsy at the morning meeting.</div><div class="example-ko">밤새 옷을 입은 채로 잠을 잔 탓에, 그녀는 아침 회의에서 꽤 지저분해 보였다.</div></div>
+</div>
+<div class="word-block" id="word-72">
+  <div class="word-title">gargantuan</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/gahr-GAN-chuh-wun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Gargantuan describes something that is very large in size or amount; something gargantuan is, in other words, gigantic.</div><div class="word-def-ko">크기나 양이 매우 거대한 것을 묘사하며, 다시 말해 엄청나게 큰 것을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The cleanup crew faced a gargantuan task after the massive festival</div><div class="example-ko">대규모 축제가 끝난 후 청소팀은 엄청난 양의 업무에 직면했습니다.</div></div>
+</div>
+<div class="word-block" id="word-73">
+  <div class="word-title">garner</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/GAHR-ner/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To acquire by effort; earn, or to accumulate or collect.</div><div class="word-def-ko">(노력을 통해) 얻다, 모으다, 축적하다.</div>
+  <div class="example-wrap"><div class="example-en">The movie garnered critical acclaim for its unique storytelling and</div><div class="example-ko">그 영화는 독특한 스토리텔링과 시각 효과로 비평가들의 찬사를 받았습니다.</div></div>
+</div>
+<div class="word-block" id="word-74">
+  <div class="word-title">gauche</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/GOHSH/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Describes someone or something having or showing a lack of awareness about the proper way to behave.</div><div class="word-def-ko">서투르고 눈치 없는, 사회적으로 미숙한.</div>
+  <div class="example-wrap"><div class="example-en">His gauche comment about her age silenced the entire dinner party.</div><div class="example-ko">그녀의 나이에 대한 그의 눈치 없는 발언은 저녁 파티 전체를 침묵에 빠뜨렸다.</div></div>
+</div>
+<div class="word-block" id="word-75">
+  <div class="word-title">Goldilocks</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/GOHL-dee-lahks/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Goldilocks describes a situation or thing that is just right, neither too much nor too little, ideal.</div><div class="word-def-ko">딱 알맞은 최적의 균형</div>
+  <div class="example-wrap"><div class="example-en">Economists described it as a Goldilocks economy — not too hot, not too cold.</div><div class="example-ko">경제학자들은 그것을 골디락스 경제라고 표현했다 — 너무 뜨겁지도, 너무 차갑지도 않은.</div></div>
+</div>
+<div class="word-block" id="word-76">
+  <div class="word-title">grandiose</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/gran-dee-OHSS/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Grandiose describes something impressive and imposing in appearance or style, especially pretentiously so.</div><div class="word-def-ko">거창하고 과장된(실속 없는)</div>
+  <div class="example-wrap"><div class="example-en">His grandiose plans for the company turned out to be completely unrealistic.</div><div class="example-ko">회사를 위한 그의 거창한 계획은 완전히 비현실적인 것으로 드러났다.</div></div>
+</div>
+<div class="word-block" id="word-77">
+  <div class="word-title">grift</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/GRIFT/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To grift is to use dishonest tricks to illegally take money or property.</div><div class="word-def-ko">부정한 속임수를 사용하여 불법적으로 돈이나 재산을 가로채다(사취하다).</div>
+  <div class="example-wrap"><div class="example-en">The fake charity used emotional photos to grift donations from</div><div class="example-ko">그 가짜 자선 단체는 동정심 많은 사람들에게서 기부금을 사취하기 위해 감성적인 사진들을 사용했다.</div></div>
+</div>
+<div class="word-block" id="word-78">
+  <div class="word-title">gumbo</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/GUM-boh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Gumbo is a spicy stew from Louisiana typically containing meat or shellfish, okra, and various vegetables; also used to describe a mixture of diverse elements.</div><div class="word-def-ko">걸쭉한 수프 요리; 문화적 혼합물</div>
+  <div class="example-wrap"><div class="example-en">The city's culture is a gumbo of African, French, and Native American influences.</div><div class="example-ko">그 도시의 문화는 아프리카, 프랑스, 아메리카 원주민의 영향이 뒤섞인 혼합물이다.</div></div>
+</div>
+<div class="word-block" id="word-79">
+  <div class="word-title">hark back</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/HAHRK-BAK/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To hark back means to recall or evoke a past event, time, or thing.</div><div class="word-def-ko">과거의 주제로 되돌아가다, 기원을 상기시키다</div>
+  <div class="example-wrap"><div class="example-en">His musical style harks back to the jazz era of the 1940s.</div><div class="example-ko">그의 음악 스타일은 1940년대 재즈 시대를 상기시킨다.</div></div>
+</div>
+<div class="word-block" id="word-80">
+  <div class="word-title">hector</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/HEK-ter/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To hector is to talk to someone in a bullying or intimidating way.</div><div class="word-def-ko">위협적으로 몰아붙이다</div>
+  <div class="example-wrap"><div class="example-en">The manager would constantly hector his staff in front of clients, damaging team morale.</div><div class="example-ko">그 관리자는 고객 앞에서 끊임없이 직원들을 윽박질러 팀 사기를 저하시켰다.</div></div>
+</div>
+<div class="word-block" id="word-81">
+  <div class="word-title">heyday</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/HAY-day/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Heyday refers to the period of one's greatest popularity, vigor, or prosperity.</div><div class="word-def-ko">개인이나 사물의 인기가 가장 높거나 활기, 번영이 최고조에 달했던 시기를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The 1990s were the heyday of pop music, with many legendary groups debuting during that time.</div><div class="example-ko">1990년대는 많은 전설적인 그룹들이 그 시기에 데뷔했던 팝 음악의 전성기였습니다.</div></div>
+</div>
+<div class="word-block" id="word-82">
+  <div class="word-title">hibernaculum</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/hye-ber-NAK-yuh-lum/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Refers to a shelter occupied during the winter by a dormant animal, such as an insect, snake, bat, or marmot.</div><div class="word-def-ko">곤충, 뱀, 박쥐, 마멋과 같은 동물이 겨울 동안 머무는 은신처(동면 장소)를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">To temporize is to avoid making a decision or giving a definite answer in order to have more time.</div><div class="example-ko">박쥐 무리는 혹독한 겨울을 나기 위해 지하에 있는 그들의 동면 장소로 돌아왔습니다.</div></div>
+</div>
+<div class="word-block" id="word-83">
+  <div class="word-title">hobgoblin</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/muh-NAJ-uh-ree/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A hobgoblin is a mischievous goblin that plays tricks in children's stories.</div><div class="word-def-ko">홉고블린은 어린이 이야기에서 장난을 치는 짓궂은 고블린입니다. (비유적으로는 두려움이나 걱정의 대상을 의미하기도 합니다.)</div>
+  <div class="example-wrap"><div class="example-en">For many, the fear of failure is a hobgoblin that prevents them from pursuing their dreams.</div><div class="example-ko">많은 사람들에게 실패에 대한 두려움은 꿈을 좇지 못하게 만드는 홉고블린 (두려움의 대상)입니다.</div></div>
+</div>
+<div class="word-block" id="word-84">
+  <div class="word-title">hornswoggle</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/HORN-swah-gul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To hornswoggle someone is to trick or deceive them.</div><div class="word-def-ko">누군가를 속이거나 기만하다.</div>
+  <div class="example-wrap"><div class="example-en">The salesman tried to hornswoggle me into buying a broken car, but I saw</div><div class="example-ko">그 영업사원은 나를 속여서 고장 난 차를 사게 하려 했지만, 나는 그의 거짓말을 간파했다.</div></div>
+</div>
+<div class="word-block" id="word-85">
+  <div class="word-title">iconoclast</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/eye-KAH-nuh-klast/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">anyone who criticizes or opposes beliefs and practices that are widely accepted.</div><div class="word-def-ko">널리 받아들여지는 신념이나 관행을 비판하거나 반대하는 사람.</div>
+  <div class="example-wrap"><div class="example-en">As an iconoclast in the art world, he painted in a style that broke all traditional rules.</div><div class="example-ko">미술계의 우상 파괴자로서, 그는 모든 전통적인 규칙을 깨는 스타일로 그림을 그렸습니다.</div></div>
+</div>
+<div class="word-block" id="word-86">
+  <div class="word-title">imbue</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/im-BYOO/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To imbue something is to inspire or permeate it with a feeling or quality.</div><div class="word-def-ko">성질을 불어넣다, 스며들게 하다</div>
+  <div class="example-wrap"><div class="example-en">The teacher tried to imbue her students with a love of literature from an early age.</div><div class="example-ko">그 교사는 어릴 때부터 학생들에게 문학에 대한 사랑을 불어넣으려 했다.</div></div>
+</div>
+<div class="word-block" id="word-87">
+  <div class="word-title">imprimatur</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/im-pruh-MAH-toor/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Imprimatur means formal approval or permission, especially from an</div><div class="word-def-ko">승인, 허가</div>
+  <div class="example-wrap"><div class="example-en">The festival had the university's imprimatur despite being</div><div class="example-ko">독립적으로 개최되었지만, 축제는 대학의 승인을 받았다.</div></div>
+</div>
+<div class="word-block" id="word-88">
+  <div class="word-title">innocuous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ih-NAH-kyuh-wus/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Innocuous describes something not harmful or offensive; completely harmless.</div><div class="word-def-ko">해를 끼치지 않는, 무해한, 악의 없는</div>
+  <div class="example-wrap"><div class="example-en">What seemed like an innocuous comment sparked an unexpected controversy online.</div><div class="example-ko">무해해 보였던 발언이 온라인에서 예상치 못한 논란을 불러일으켰다.</div></div>
+</div>
+<div class="word-block" id="word-89">
+  <div class="word-title">inoculate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/-NAHK/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To introduce immunologically active material into a person or animal especially in order to treat or prevent a disease.</div><div class="word-def-ko">질병을 치료하거나 예방하기 위해 사람이나 동물에게 면역 물질(백신 등)을 주입하다 (예방 접종하다).</div>
+  <div class="example-wrap"><div class="example-en">The government plans to inoculate the entire population against the new</div><div class="example-ko">정부는 연말까지 전 국민에게 새로운 바이러스에 대한 예방 접종을 실시할 계획이다.</div></div>
+</div>
+<div class="word-block" id="word-90">
+  <div class="word-title">jaunty</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/JAWN-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Something described as jaunty is lively in manner or appearance.</div><div class="word-def-ko">태도나 겉모습이 쾌활하고 의기양양한 것을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">She walked into the office with a jaunty step, humming a happy tune.</div><div class="example-ko">그녀는 행복한 곡조를 흥얼거리며 경쾌한 발걸음으로 사무실에 들어왔다.</div></div>
+</div>
+<div class="word-block" id="word-91">
+  <div class="word-title">jejune</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/jih-JOON/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Jejune is a formal word that means "uninteresting" or "boring," or describes things that are immature, childish, or simplistic.</div><div class="word-def-ko">흥미가 없거나 지루하며, 미성숙하고 유치하거나 너무 단순한 것을 의미하는 격식 있는 단어입니다.</div>
+  <div class="example-wrap"><div class="example-en">Nadir refers to the lowest or worst point of something.</div><div class="example-ko">어떤 것의 가장 낮거나 최악인 지점(최저점)을 의미합니다.</div></div>
+</div>
+<div class="word-block" id="word-92">
+  <div class="word-title">knackered</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/NAK-erd/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Knackered is an informal British term meaning extremely tired, or worn out and broken.</div><div class="word-def-ko">몹시 지친, 녹초가 된</div>
+  <div class="example-wrap"><div class="example-en">After the twelve-hour shift, she was completely knackered and fell asleep on the sofa.</div><div class="example-ko">12시간 교대 근무 후 그녀는 완전히 지쳐서 소파에서 잠들었다.</div></div>
+</div>
+<div class="word-block" id="word-93">
+  <div class="word-title">laconic</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/luh-KAH-nik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Laconic describes using very few words to express something; brief and concise.</div><div class="word-def-ko">말수가 적고 간결한</div>
+  <div class="example-wrap"><div class="example-en">His laconic reply of 'fine' gave no indication of how he truly felt.</div><div class="example-ko">그의 간결한 '괜찮아'라는 대답은 그가 실제로 어떻게 느끼는지 전혀 알 수 없게 했다.</div></div>
+</div>
+<div class="word-block" id="word-94">
+  <div class="word-title">leviathan</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/luh-VYE-uh-thun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Leviathan is a word that refers broadly to something very large and powerful, or more narrowly to a large sea animal.</div><div class="word-def-ko">매우 거대하고 강력한 것(조직, 국가 등), 또는 거대한 바다 생물을 광범위하게 지칭합니다.</div>
+  <div class="example-wrap"><div class="example-en">The huge container ship was a steel leviathan that dwarfed every other</div><div class="example-ko">그 거대한 컨테이너선은 항구에 있는 다른 모든 배를 아주 작아 보이게 만드는 강철로 된 거인이었습니다.</div></div>
+</div>
+<div class="word-block" id="word-95">
+  <div class="word-title">libertine</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/LIB-er-teen/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A libertine is a person who freely indulges in sensual pleasures without moral restraint.</div><div class="word-def-ko">도덕적으로 방종한 사람</div>
+  <div class="example-wrap"><div class="example-en">The memoir portrayed him as a libertine who lived entirely for his own pleasures.</div><div class="example-ko">그 회고록은 그를 오로지 자신의 쾌락만을 위해 살았던 방탕한 사람으로 묘사했다.</div></div>
+</div>
+<div class="word-block" id="word-96">
+  <div class="word-title">loll</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/LAHL/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To loll is to sit, lie, or hang in a relaxed, lazy way; to hang loosely.</div><div class="word-def-ko">축 늘어져 있다, 나른하게 행동하다</div>
+  <div class="example-wrap"><div class="example-en">The cat lolled in the sunshine, completely indifferent to everything around it.</div><div class="example-ko">고양이는 햇살 속에서 주위의 모든 것에 완전히 무관심한 채 느긋하게 늘어져 있었다.</div></div>
+</div>
+<div class="word-block" id="word-97">
+  <div class="word-title">lout</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/lout/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Lout refers to a crude, awkward, or disrespectful person, typically a</div><div class="word-def-ko">버릇없고 무례한 사람</div>
+  <div class="example-wrap"><div class="example-en">He acted like a lout at dinner, interrupting everyone.</div><div class="example-ko">그는 저녁 식사 자리에서 모두의 말을 끊으며 무례했다.</div></div>
+</div>
+<div class="word-block" id="word-98">
+  <div class="word-title">marginalia</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/mahr-juh-NAY-lee-uh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Marginalia are notes or illustrations written in the margins of a book or manuscript.</div><div class="word-def-ko">페이지 여백에 적은 메모나 낙서</div>
+  <div class="example-wrap"><div class="example-en">The scholar found valuable marginalia in the ancient text that shed light on its meaning.</div><div class="example-ko">학자는 고대 문헌에서 그 의미를 밝혀주는 귀중한 여백 주석을 발견했다.</div></div>
+</div>
+<div class="word-block" id="word-99">
+  <div class="word-title">mea culpa</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/may-uh-KOOL-puh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Mea culpa is an acknowledgment of one's fault or error; a formal apology.</div><div class="word-def-ko">자신의 잘못 인정</div>
+  <div class="example-wrap"><div class="example-en">The CEO issued a public mea culpa for the company's handling of the data breach.</div><div class="example-ko">CEO는 회사의 데이터 유출 처리에 대해 공개적으로 사과했다.</div></div>
+</div>
+<div class="word-block" id="word-100">
+  <div class="word-title">meme</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/MEEM/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A meme is an element of culture or behavior that spreads from person to person; today commonly refers to a humorous image or video spread online.</div><div class="word-def-ko">인터넷 밈, 문화 전파 단위</div>
+  <div class="example-wrap"><div class="example-en">The politician's awkward gesture became a popular meme overnight.</div><div class="example-ko">그 정치인의 어색한 제스처는 하룻밤 사이에 인기 있는 밈이 되었다.</div></div>
+</div>
+<div class="word-block" id="word-101">
+  <div class="word-title">menagerie</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/muh-NAJ-uh-ree/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A menagerie is a collection of wild animals kept in captivity for exhibition, or a diverse and varied group.</div><div class="word-def-ko">대중에게 보여주기 위해 사육되는 동물들의 집합 또는 장소</div>
+  <div class="example-wrap"><div class="example-en">The old antique shop was a fascinating menagerie of forgotten treasures and peculiar items.</div><div class="example-ko">그 오래된 골동품 가게는 잊힌 보물들과 기이한 물건들의 매력적인 집합소였다.</div></div>
+</div>
+<div class="word-block" id="word-102">
+  <div class="word-title">metonymy</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/muh-TAH-nuh-mee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Metonymy refers to a figure of speech in which a word that is associated with something is used to refer to the thing itself, as when crown is used to mean "king" or "queen."</div><div class="word-def-ko">어떤 사물과 관련된 단어를 사용하여 그 사물 자체를 가리키는 수사법. 예를 들어 '왕관(crown)'으로 '왕'이나 '여왕'을 의미하는 경우를 말합니다.</div>
+  <div class="example-wrap"><div class="example-en">In journalism, using "the Pentagon" to refer to the U.S. Department of Defense is a common form of metonymy.</div><div class="example-ko">저널리즘에서 "펜타곤"을 미국 국방부를 지칭하는 데 사용하는 것은 환유의 흔한 형태입니다.</div></div>
+</div>
+<div class="word-block" id="word-103">
+  <div class="word-title">multitudinous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/mul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Existing in a great multitude---that is, "very many"---or consisting of innumerable elements or aspects.</div><div class="word-def-ko">대단히 많은 수로 존재하거나, 셀 수 없이 많은 요소나 측면으로 구성된 상태를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The problems facing the project were multitudinous, ranging from budget</div><div class="example-ko">그 프로젝트가 직면한 문제들은 예산 삭감부터 기술적 결함까지 수없이 많았습니다.</div></div>
+</div>
+<div class="word-block" id="word-104">
+  <div class="word-title">nadir</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/NAY-deer/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Nadir refers to the lowest or worst point of something.</div><div class="word-def-ko">최저점, 인생의 바닥</div>
+  <div class="example-wrap"><div class="example-en">After the scandal, the politician's popularity reached its nadir.</div><div class="example-ko">스캔들이 터진 후, 그 정치인의 인기는 최저점에 도달했다.</div></div>
+</div>
+<div class="word-block" id="word-105">
+  <div class="word-title">nefarious</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/nih-FAIR-ee-us/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Nefarious describes someone or something that is wicked or criminal in nature.</div><div class="word-def-ko">사악한, 비도덕적인, 범죄의</div>
+  <div class="example-wrap"><div class="example-en">The detective uncovered the nefarious plot to defraud thousands of investors.</div><div class="example-ko">형사는 수천 명의 투자자를 사기 치려는 사악한 음모를 밝혀냈다.</div></div>
+</div>
+<div class="word-block" id="word-106">
+  <div class="word-title">nettle</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/NET-ul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To nettle someone is to irritate or annoy them; as a noun, a plant with stinging leaves.</div><div class="word-def-ko">짜증 나게 하다, 성나게 하다</div>
+  <div class="example-wrap"><div class="example-en">His dismissive tone nettled her far more than the criticism itself.</div><div class="example-ko">그의 무시하는 태도는 비판 자체보다 그녀를 훨씬 더 짜증나게 했다.</div></div>
+</div>
+<div class="word-block" id="word-107">
+  <div class="word-title">noel</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/noh-EL/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Noel is another word for Christmas, often used in carols and songs.</div><div class="word-def-ko">크리스마스 또는 크리스마스 캐럴</div>
+  <div class="example-wrap"><div class="example-en">The choir sang the first noel as snow began to fall outside the church.</div><div class="example-ko">성가대가 첫 번째 크리스마스 캐롤을 부르는 동안 교회 밖에 눈이 내리기 시작했다.</div></div>
+</div>
+<div class="word-block" id="word-108">
+  <div class="word-title">notorious</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/noh-TOR-ee-us/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Notorious describes people and things that are well-known or famous, especially for something bad or unfavorable.</div><div class="word-def-ko">주로 나쁘거나 좋지 않은 일로 잘 알려져 있거나 유명한 사람 또는 사물을 묘사합니다. (악명 높은)</div>
+  <div class="example-wrap"><div class="example-en">The highway is notorious for its frequent accidents and heavy traffic</div><div class="example-ko">그 고속도로는 빈번한 사고와 심한 교통 체증으로 악명이 높습니다.</div></div>
+</div>
+<div class="word-block" id="word-109">
+  <div class="word-title">oaf</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/OHF/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Oaf is used to refer to someone as big, clumsy, and slow-witted.</div><div class="word-def-ko">덩치가 크고 행동이 굼뜨며 우둔한 사람(멍청이, 미련퉁이)을 가리킵니다.</div>
+  <div class="example-wrap"><div class="example-en">Don't be such a clumsy oaf and watch where you're stepping!</div><div class="example-ko">그렇게 덤벙대는 멍청이처럼 굴지 말고 발밑 좀 보고 다녀!</div></div>
+</div>
+<div class="word-block" id="word-110">
+  <div class="word-title">onomatopoeia</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ah-nuh-mah-tuh-PEE-uh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Onomatopoeia is the formation of a word from a sound associated with its meaning, such as 'buzz' or 'crash'.</div><div class="word-def-ko">의성어</div>
+  <div class="example-wrap"><div class="example-en">The poem was filled with onomatopoeia, making the sounds of nature come alive on the page.</div><div class="example-ko">그 시는 의성어로 가득 차 있어, 자연의 소리가 페이지 위에서 생생하게 살아났다.</div></div>
+</div>
+<div class="word-block" id="word-111">
+  <div class="word-title">ostracize</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/AH-struh-syze/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To ostracize someone is to exclude them from a group by the agreement of the group's members.</div><div class="word-def-ko">(집단 구성원들의 합의에 따라) 누군가를 집단에서 배척하거나 외면하다.</div>
+  <div class="example-wrap"><div class="example-en">After the scandal, the politician was ostracized by his own party.</div><div class="example-ko">그 스캔들 이후, 그 정치인은 자신의 정당으로부터 외면당했다.</div></div>
+</div>
+<div class="word-block" id="word-112">
+  <div class="word-title">paean</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/PEE-un/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A paean is a song of praise or joy, or a written or spoken expression of enthusiastic praise.</div><div class="word-def-ko">찬가, 찬양의 글</div>
+  <div class="example-wrap"><div class="example-en">Her acceptance speech was a heartfelt paean to her mentors and family.</div><div class="example-ko">그녀의 수상 소감은 스승과 가족에 대한 진심 어린 찬사였다.</div></div>
+</div>
+<div class="word-block" id="word-113">
+  <div class="word-title">paradox</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/PAIR-uh-dahks/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A paradox is a statement or situation that seems self-contradictory or absurd but may in fact be true.</div><div class="word-def-ko">역설적 상황, 모순되어 보이나 사실인 것</div>
+  <div class="example-wrap"><div class="example-en">It is a paradox that the more choices people have, the less satisfied they often feel.</div><div class="example-ko">사람들에게 선택지가 많을수록 오히려 덜 만족한다는 것은 하나의 역설이다.</div></div>
+</div>
+<div class="word-block" id="word-114">
+  <div class="word-title">perdition</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/per-DISH-un/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Perdition refers to a state of eternal punishment and damnation in an afterlife; utter ruin.</div><div class="word-def-ko">지옥, 또는 사후에 받는 영원한 벌(파멸)</div>
+  <div class="example-wrap"><div class="example-en">The preacher warned his congregation that greed would lead them to perdition.</div><div class="example-ko">목사는 신도들에게 탐욕이 영원한 멸망으로 이끌 것이라고 경고했다.</div></div>
+</div>
+<div class="word-block" id="word-115">
+  <div class="word-title">peremptory</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/puh-REMP-tuh-ree/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Describes an order, command, etc., that requires immediate compliance with no opportunity to show why one should not comply.</div><div class="word-def-ko">반론의 여지 없이 즉각적인 복종을 요구하는, 위압적인, 독단적인</div>
+  <div class="example-wrap"><div class="example-en">With a peremptory wave of his hand, the director dismissed all further questions from the reporters.</div><div class="example-ko">감독은 독단적인 손짓으로 기자들의 모든 추가 질문을 일축했다.</div></div>
+</div>
+<div class="word-block" id="word-116">
+  <div class="word-title">preeminent</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/pree-EM-uh-nunt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A formal word used to describe someone or something more important, skillful, or successful than their counterparts or peers.</div><div class="word-def-ko">동료나 경쟁자들보다 더 중요하거나, 능숙하거나, 성공적인 사람 또는 사물을 묘사하는 단어입니다. (탁월한, 발군의, 독보적인)</div>
+  <div class="example-wrap"><div class="example-en">She is widely recognized as the preeminent expert on climate change</div><div class="example-ko">그녀는 그 지역에서 기후 변화 정책에 관한 독보적인 전문가로 널리 인정받고 있습니다.</div></div>
+</div>
+<div class="word-block" id="word-117">
+  <div class="word-title">prerogative</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/prih-RAH-guh-tiv/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A prerogative is an exclusive right or privilege belonging to a particular person or group.</div><div class="word-def-ko">특권, 재량권</div>
+  <div class="example-wrap"><div class="example-en">Deciding the final budget is the CEO's prerogative alone.</div><div class="example-ko">최종 예산을 결정하는 것은 CEO만의 고유 권한이다.</div></div>
+</div>
+<div class="word-block" id="word-118">
+  <div class="word-title">prescience</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/PRESH/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Prescience is a formal word used to refer to the ability to see or anticipate what will or might happen in the future.</div><div class="word-def-ko">미래에 일어날 일을 미리 내다보거나 예상하는 능력 (예지력, 선견지명)</div>
+  <div class="example-wrap"><div class="example-en">The investor's prescience regarding the market crash allowed her to</div><div class="example-ko">시장 붕괴에 대한 그 투자자의 선견지명 덕분에 그녀는 가격이 폭락하기 전에 주식을 팔 수 있었다.</div></div>
+</div>
+<div class="word-block" id="word-119">
+  <div class="word-title">pseudonym</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/SOO-duh-nim/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A pseudonym is a name that someone (such as a writer) uses instead of their real name.</div><div class="word-def-ko">(작가 등이) 본명 대신 사용하는 이름, 즉 필명이나 가명을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">To protect her privacy, the famous blogger wrote under a pseudonym, known to her readers only as "Luna".</div><div class="example-ko">그 유명 블로거는 사생활을 보호하기 위해 필명으로 글을 썼고, 독자들에게는 '루나'로만 알려져 있었습니다.</div></div>
+</div>
+<div class="word-block" id="word-120">
+  <div class="word-title">putative</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/PYOO-tuh-tiv/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Putative is a formal word used to describe something that is generally believed, supposed, or assumed to be something specified.</div><div class="word-def-ko">일반적으로 그렇다고 믿어지거나, 추정되거나, 가정되는 상태를 나타내는 격식 있는 단어입니다.</div>
+  <div class="example-wrap"><div class="example-en">The putative cause of the technical glitch was a minor error in the</div><div class="example-ko">기술적 결함의 추정되는 원인은 소프트웨어 코드의 작은 오류였습니다.)</div></div>
+</div>
+<div class="word-block" id="word-121">
+  <div class="word-title">quiddity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/KWID-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Quiddity refers to the essence of a thing---that is, whatever makes something the type of thing that it is.</div><div class="word-def-ko">사물의 본질, 즉 어떤 것을 바로 그 사물이게끔 만드는 핵심적인 요소를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The philosopher spent his entire life trying to define the quiddity of</div><div class="example-ko">그 철학자는 인간 존재의 본질을 규명하는 데 평생을 바쳤습니다.</div></div>
+</div>
+<div class="word-block" id="word-122">
+  <div class="word-title">radial</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/-dee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Radial describes things that are arranged or have parts arranged in straight lines coming out from the center of a circle.</div><div class="word-def-ko">원의 중심에서 뻗어 나오는 직선 형태로 배열되거나 그런 부분을 가진 것을 묘사합니다.</div>
+  <div class="example-wrap"><div class="example-en">The spider web had a beautiful radial design, with threads extending from the center.</div><div class="example-ko">그 거미줄은 중앙에서부터 실이 뻗어 나가는 아름다운 방사형 디자인을 하고 있었습니다.</div></div>
+</div>
+<div class="word-block" id="word-123">
+  <div class="word-title">rapscallion</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/rap-SKAL-yun/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A rapscallion is a mischievous person, especially a child; a rascal.</div><div class="word-def-ko">장난기 많은 악동</div>
+  <div class="example-wrap"><div class="example-en">The little rapscallion had hidden his sister's toys just to see her reaction.</div><div class="example-ko">그 장난꾸러기 꼬마는 언니의 반응을 보려고 언니 장난감을 숨겨 놓았다.</div></div>
+</div>
+<div class="word-block" id="word-124">
+  <div class="word-title">rash</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/RASH/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Rash describes something done or made quickly and without thought about what will happen as a result.</div><div class="word-def-ko">결과에 대해 깊이 생각하지 않고 성급하게 혹은 성급하게 내린 결정이나 행동을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">It was a rash decision to invest all of his savings in the volatile</div><div class="example-ko">변동성이 큰 주식 시장에 모든 저축액을 투자한 것은 성급한 결정이었다.</div></div>
+</div>
+<div class="word-block" id="word-125">
+  <div class="word-title">reciprocate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/rih-SIP-ruh-kayt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To reciprocate is to do something for or to someone who has done something similar for or to you.</div><div class="word-def-ko">자신에게 비슷한 일을 해준 상대방에게 보답하거나 똑같이 행동하는 것을 의미합니다. (또한 상대방이 자신에게 가진 감정과 똑같은 감정을 갖는다는 뜻으로도 쓰입니다.)</div>
+  <div class="example-wrap"><div class="example-en">After receiving so much help from her neighbors during the storm, she looked for a way to reciprocate their kindness.</div><div class="example-ko">폭풍이 칠 때 이웃들에게 많은 도움을 받은 후, 그녀는 그들의 친절에 보답할 방법을 찾았다.</div></div>
+</div>
+<div class="word-block" id="word-126">
+  <div class="word-title">resplendent</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/rih-SPLEN-dunt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A literary word used to describe someone or something as very bright and attractive.</div><div class="word-def-ko">사람이나 사물이 매우 밝고 매력적인 모습을 묘사하는 문어체 단어 (눈부시게 빛나는, 찬란한)</div>
+  <div class="example-wrap"><div class="example-en">The palace garden was resplendent with colorful flowers blooming in the</div><div class="example-ko">궁전 정원은 봄 햇살 아래 피어난 형형색색의 꽃들로 눈부시게 빛나고 있었다.</div></div>
+</div>
+<div class="word-block" id="word-127">
+  <div class="word-title">retrospective</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/reh-truh-SPEK-tiv/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Retrospective means looking back on or dealing with past events or situations; as a noun, an exhibition of an artist's past work.</div><div class="word-def-ko">과거를 돌이켜보는, 회고적인</div>
+  <div class="example-wrap"><div class="example-en">The museum held a retrospective of his paintings spanning four decades.</div><div class="example-ko">박물관은 40년에 걸친 그의 회화 작품 회고전을 개최했다.</div></div>
+</div>
+<div class="word-block" id="word-128">
+  <div class="word-title">salubrious</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/sə-LOO-bree-əs/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Salubrious describes something favorable to health or well-being.</div><div class="word-def-ko">건강에 좋은</div>
+  <div class="example-wrap"><div class="example-en">The resort is famous for its salubrious mountain air.</div><div class="example-ko">그 휴양지는 건강에 좋은 산 공기로 유명하다.</div></div>
+</div>
+<div class="word-block" id="word-129">
+  <div class="word-title">sartorial</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/sahr-TOR-ee-ul/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Sartorial relates to tailoring, clothes, or style of dress.</div><div class="word-def-ko">의복과 관련된</div>
+  <div class="example-wrap"><div class="example-en">His sartorial elegance set him apart in every room he entered.</div><div class="example-ko">그의 세련된 옷차림은 그가 들어서는 모든 방에서 그를 돋보이게 했다.</div></div>
+</div>
+<div class="word-block" id="word-130">
+  <div class="word-title">schmooze</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/SHMOOZ/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To schmooze is to warmly chat with someone often in order to gain favor, business, or connections.</div><div class="word-def-ko">호의를 얻거나 사업상 이익, 인맥을 쌓기 위해 누군가와 다정하게 수다를 떨다(비위를 맞추다).</div>
+  <div class="example-wrap"><div class="example-en">At the charity gala, he spent the entire evening trying to schmooze with</div><div class="example-ko">자선 갈라 행사에서 그는 자신의 새 프로젝트 자금을 지원받기 위해 저녁 내내 부유한 기부자들과 사교적으로 대화하며 비위를 맞추는 데 시간을 보냈다.</div></div>
+</div>
+<div class="word-block" id="word-131">
+  <div class="word-title">scrutinize</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/SKROO-tuh-nyze/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To scrutinize is to examine or inspect closely and thoroughly.</div><div class="word-def-ko">면밀히 조사하다</div>
+  <div class="example-wrap"><div class="example-en">The auditors scrutinized every transaction in the company's financial records.</div><div class="example-ko">감사원들은 회사의 재무 기록에 있는 모든 거래를 면밀히 검토했다.</div></div>
+</div>
+<div class="word-block" id="word-132">
+  <div class="word-title">senescence</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/sih-NESS-unss/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Senescence is the condition or process of deterioration with age, or the aging of cells.</div><div class="word-def-ko">노화, 늙어가는 과정</div>
+  <div class="example-wrap"><div class="example-en">Researchers are studying cellular senescence in the hope of slowing the aging process.</div><div class="example-ko">연구자들은 노화 과정을 늦추기 위한 희망으로 세포 노화를 연구하고 있다.</div></div>
+</div>
+<div class="word-block" id="word-133">
+  <div class="word-title">sensibility</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/sen-suh-BIL-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Refers to someone's personal or cultural approach to what they encounter, or the ability to feel and understand emotions.</div><div class="word-def-ko">어떤 대상에 대해 개인이 또는 문화적으로 접근하는 방식, 혹은 감정을 느끼고 이해하는 능력(감수성)을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">The designer's modern sensibility transformed the old building into a</div><div class="example-ko">그 디자이너의 현대적인 감수성은 낡은 건물을 활기찬 예술 공간으로 탈바꿈시켰다.</div></div>
+</div>
+<div class="word-block" id="word-134">
+  <div class="word-title">serendipity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/sair-un-DIP-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Serendipity refers to luck that takes the form of finding valuable or pleasant things that are not looked for, or to an instance of such luck.</div><div class="word-def-ko">찾으려 하지 않았던 가치 있거나 즐거운 것들을 우연히 발견하는 행운, 또는 그러한 행운의 사례.</div>
+  <div class="example-wrap"><div class="example-en">The discovery of penicillin was a classic case of scientific serendipity.</div><div class="example-ko">페니실린의 발견은 과학적 세렌디피티의 전형적인 사례였습니다.</div></div>
+</div>
+<div class="word-block" id="word-135">
+  <div class="word-title">short shrift</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/SHORT-SHRIFT/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Short shrift means "little or no attention or thought" or "quick work."</div><div class="word-def-ko">거의 관심이나 생각을 주지 않음(무시), 또는 어떤 일을 빠르게 해치워 버리는 것.</div>
+  <div class="example-wrap"><div class="example-en">The committee gave short shrift to the proposal, rejecting it after only</div><div class="example-ko">위원회는 그 제안에 거의 관심을 두지 않았고, 단 5분간의 논의 끝에 거절해 버렸다.</div></div>
+</div>
+<div class="word-block" id="word-136">
+  <div class="word-title">spiel</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/SPEEL/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A spiel is a long or fast speech intended to persuade someone of something, often rehearsed.</div><div class="word-def-ko">설득을 위한 능숙한 말발</div>
+  <div class="example-wrap"><div class="example-en">The salesman launched into his practiced spiel the moment the door opened.</div><div class="example-ko">문이 열리자마자 영업사원은 능숙하게 준비된 설득 연설을 시작했다.</div></div>
+</div>
+<div class="word-block" id="word-137">
+  <div class="word-title">spontaneous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/spahn-TAY-nee-us/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Spontaneous describes actions or speech that happen naturally and</div><div class="word-def-ko">즉흥적·자연스러운</div>
+  <div class="example-wrap"><div class="example-en">The kitten captured our hearts, and we made the spontaneous decision</div><div class="example-ko">새끼 고양이에 반해 즉흥적으로 입양을 결정했다. 메리엄-웹스터 사전</div></div>
+</div>
+<div class="word-block" id="word-138">
+  <div class="word-title">sustain</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/suh-STAYN/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To sustain someone or something is to provide what is needed for that person or thing to exist or continue.</div><div class="word-def-ko">어떤 사람이나 사물이 존재하거나 계속될 수 있도록 필요한 것을 제공하여 지탱하다.</div>
+  <div class="example-wrap"><div class="example-en">It's difficult to sustain economic growth during a global recession.</div><div class="example-ko">세계적인 불경기 동안 경제 성장을 지속하기는 어렵습니다.</div></div>
+</div>
+<div class="word-block" id="word-139">
+  <div class="word-title">syllogism</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/SIL-uh-jiz-um/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A syllogism is a form of logical reasoning in which a conclusion is drawn from two given premises.</div><div class="word-def-ko">삼단논법</div>
+  <div class="example-wrap"><div class="example-en">His argument was a classic syllogism: all humans are mortal, he is human, therefore he is mortal.</div><div class="example-ko">그의 논증은 전형적인 삼단논법이었다: 모든 인간은 죽는다, 그는 인간이다, 따라서 그는 죽는다.</div></div>
+</div>
+<div class="word-block" id="word-140">
+  <div class="word-title">tabula rasa</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/TAB-yuh-luh-RAH-zuh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Tabula rasa refers to a person without prior knowledge or preconceptions; a blank slate.</div><div class="word-def-ko">백지 상태</div>
+  <div class="example-wrap"><div class="example-en">Philosophers debate whether the mind at birth is truly a tabula rasa.</div><div class="example-ko">철학자들은 태어날 때의 마음이 정말로 백지 상태인지 논쟁한다.</div></div>
+</div>
+<div class="word-block" id="word-141">
+  <div class="word-title">temerity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/tuh-MAIR-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Temerity is the quality of being confident and unafraid of danger or punishment, especially in a way that seems rude or foolish.</div><div class="word-def-ko">특히 무례하거나 어리석어 보일 정도로 위험이나 처벌을 두려워하지 않는 자신감 있는 특성.</div>
+  <div class="example-wrap"><div class="example-en">The rookie lawyer had the temerity to challenge the judge's ruling in front of the entire court.</div><div class="example-ko">그 신입 변호사는 법정 전체 앞에서 판사의 판결에 이의를 제기하는 무모함을 보였다.</div></div>
+</div>
+<div class="word-block" id="word-142">
+  <div class="word-title">temporize</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/TEM-puh-ryze/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To temporize is to avoid making a decision or committing to a position in order to gain time.</div><div class="word-def-ko">시간을 벌기 위해 결정을 미루거나 확답을 피하다</div>
+  <div class="example-wrap"><div class="example-en">Rather than addressing the problem directly, the politician chose to temporize with vague statements.</div><div class="example-ko">문제를 직접 해결하는 대신, 그 정치인은 모호한 발언으로 시간을 끌기로 했다.</div></div>
+</div>
+<div class="word-block" id="word-143">
+  <div class="word-title">titanic</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/tye-TAN-ik/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Titanic describes something of exceptional strength, size, or power.</div><div class="word-def-ko">매우 거대한, 위력이 엄청난</div>
+  <div class="example-wrap"><div class="example-en">The merger required a titanic effort from both legal and financial teams.</div><div class="example-ko">그 합병에는 법무팀과 재무팀 모두의 엄청난 노력이 필요했다.</div></div>
+</div>
+<div class="word-block" id="word-144">
+  <div class="word-title">truculent</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/TRUCK-yuh-lunt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Describes a person who is easily annoyed and eager to argue or fight.</div><div class="word-def-ko">쉽게 짜증을 내며 싸우거나 언쟁하려 드는, 공격적인, 호전적인</div>
+  <div class="example-wrap"><div class="example-en">The toddler became truculent whenever he didn't get the toy he wanted.</div><div class="example-ko">그 유아는 원하는 장난감을 갖지 못할 때마다 공격적으로 변했습니다.</div></div>
+</div>
+<div class="word-block" id="word-145">
+  <div class="word-title">umbrage</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/UM-brij/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Umbrage refers to a feeling of being offended by what someone has said or done.</div><div class="word-def-ko">누군가의 말이나 행동으로 인해 느끼는 불쾌감이나 노여움을 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">He took umbrage at the suggestion that his success was merely due to</div><div class="example-ko">그는 자신의 성공이 단지 운 때문이었다는 암시에 불쾌감을 느꼈습니다.</div></div>
+</div>
+<div class="word-block" id="word-146">
+  <div class="word-title">umpteen</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/UMP-teen/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Umpteen means indefinitely many; a large but unspecified number.</div><div class="word-def-ko">셀 수 없이 많은</div>
+  <div class="example-wrap"><div class="example-en">I've told you umpteen times to back up your files before making changes.</div><div class="example-ko">변경하기 전에 파일을 백업하라고 수없이 말했잖아.</div></div>
+</div>
+<div class="word-block" id="word-147">
+  <div class="word-title">unabashed</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/un-uh-BASHT/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Someone who is unabashed is not embarrassed or ashamed about openly expressing strong feelings or opinions.</div><div class="word-def-ko">부끄러워하거나 창피해하지 않고 강한 감정이나 의견을 터놓고 표현하는.</div>
+  <div class="example-wrap"><div class="example-en">She had an unabashed love for cheesy pop music, singing along loudly in her car with the windows down.</div><div class="example-ko">그녀는 유치한 팝 음악에 대해 부끄럼 없는 애정을 가지고 있었고, 차창을 내린 채 큰 소리로 노래를 따라 불렀습니다.</div></div>
+</div>
+<div class="word-block" id="word-148">
+  <div class="word-title">undulate</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/UN-juh-layt/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To undulate is to move with a smooth, wave-like motion, or to have a wavy form.</div><div class="word-def-ko">파도처럼 움직이거나 물결 모양을 형성함</div>
+  <div class="example-wrap"><div class="example-en">The golden wheat fields undulated gently in the afternoon breeze.</div><div class="example-ko">황금빛 밀밭이 오후의 산들바람에 물결치듯 부드럽게 흔들렸다.</div></div>
+</div>
+<div class="word-block" id="word-149">
+  <div class="word-title">vamoose</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/vuh-MOOSS/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Vamoose is an informal word that means "to depart quickly."</div><div class="word-def-ko">(비격식) 서둘러 떠나다, 재빨리 사라지다.</div>
+  <div class="example-wrap"><div class="example-en">When the kids heard their mom's car pull into the driveway, they knew it was time to vamoose from the cookie jar.</div><div class="example-ko">아이들은 엄마의 차가 진입로로 들어서는 소리를 듣자, 쿠키 단지에서 재빨리 사라져야 할 시간이라는 것을 알았습니다.</div></div>
+</div>
+<div class="word-block" id="word-150">
+  <div class="word-title">vaunted</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/VAWN-tud/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Vaunted describes something that is highly praised or boasted about, sometimes more than it deserves.</div><div class="word-def-ko">과시되는, 널리 칭송되는</div>
+  <div class="example-wrap"><div class="example-en">The team's vaunted defense completely collapsed in the championship game.</div><div class="example-ko">그 팀의 자랑스러운 수비진은 챔피언십 경기에서 완전히 무너졌다.</div></div>
+</div>
+<div class="word-block" id="word-151">
+  <div class="word-title">vendetta</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/ven-DET-uh/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Vendetta refers to an active and mutual hatred between two families or groups, also known as a blood feud.</div><div class="word-def-ko">두 가문이나 집단 사이의 적극적이고 상호적인 증오, 또는 '피의 복수'라고도 불리는 불화를 의미합니다.</div>
+  <div class="example-wrap"><div class="example-en">After the merger failed, the CEO waged a personal vendetta against his</div><div class="example-ko">합병이 실패한 후, CEO는 경쟁사의 유능한 직원들을 빼내려 시도하며 개인적인 복수극을 벌였습니다.</div></div>
+</div>
+<div class="word-block" id="word-152">
+  <div class="word-title">veracity</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/vuh-RASS-uh-tee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A formal word that can refer to truth or accuracy, or to the quality of being truthful or honest.</div><div class="word-def-ko">진실이나 정확성, 또는 진실하거나 정직한 성질을 의미하는 격식 있는 단어입니다.</div>
+  <div class="example-wrap"><div class="example-en">The lawyer questioned the veracity of the witness's statement during</div><div class="example-ko">변호사는 반대 심문 중에 증인 진술의 진실성에 의문을 제기했다.</div></div>
+</div>
+<div class="word-block" id="word-153">
+  <div class="word-title">vertiginous</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ver-TIJ-uh-nus/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Vertiginous describes something extremely high or steep, causing a feeling of dizziness.</div><div class="word-def-ko">아찔한, 현기증 나는</div>
+  <div class="example-wrap"><div class="example-en">She gripped the railing tightly on the vertiginous bridge overlooking the canyon.</div><div class="example-ko">그녀는 협곡을 내려다보는 아찔하게 높은 다리에서 난간을 꽉 붙잡았다.</div></div>
+</div>
+<div class="word-block" id="word-154">
+  <div class="word-title">waggish</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/WAG-ish/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Waggish describes someone who is silly and playful, and especially someone who displays a mischievous sense of humor.</div><div class="word-def-ko">익살스럽고 장난기가 많으며, 특히 짓궂은 유머 감각을 보여주는 사람이나 행동을 묘사합니다.</div>
+  <div class="example-wrap"><div class="example-en">The teacher couldn't help but smile at the student's waggish excuse</div><div class="example-ko">선생님은 지각에 대한 학생의 익살맞은 변명에 웃음을 참을 수 없었습니다.</div></div>
+</div>
+<div class="word-block" id="word-155">
+  <div class="word-title">writhe</div>
+  <div class="word-pos">verb</div>
+  <div class="word-pron">/RYTHE/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">To writhe is to twist one's body from side to side.</div><div class="word-def-ko">(주로 고통으로) 몸을 이리저리 비틀다, 몸부림치다.</div>
+  <div class="example-wrap"><div class="example-en">The snake began to writhe after being caught in the net.</div><div class="example-ko">뱀은 그물에 걸리자 몸부림치기 시작했다.</div></div>
+</div>
+<div class="word-block" id="word-156">
+  <div class="word-title">yen</div>
+  <div class="word-pos">noun</div>
+  <div class="word-pron">/YEN/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">A yen is a longing or yearning for something.</div><div class="word-def-ko">강렬한 욕망, 갈망</div>
+  <div class="example-wrap"><div class="example-en">After years abroad, he had a deep yen to return to his hometown.</div><div class="example-ko">수년간의 해외 생활 후, 그는 고향으로 돌아가고 싶은 간절한 그리움을 느꼈다.</div></div>
+</div>
+<div class="word-block" id="word-157">
+  <div class="word-title">zany</div>
+  <div class="word-pos">adjective</div>
+  <div class="word-pron">/ZAY-nee/</div>
+  <div class="divider"></div>
+  <div class="word-def-en">Zany describes something amusingly unconventional and idiosyncratic in an endearing way.</div><div class="word-def-ko">매우 엉뚱하고 우스꽝스러운</div>
+  <div class="example-wrap"><div class="example-en">Her zany sense of humor made even the most tedious meetings bearable.</div><div class="example-ko">그녀의 엉뚱한 유머 감각은 가장 지루한 회의도 견딜 만하게 만들었다.</div></div>
+</div>
+    </div><!-- /word-list -->
+
+    <div class="closing-block">
+      <div class="closing-rule"></div>
+      <div class="closing-line">Finis</div>
+      <div class="closing-rule"></div>
+      <div class="closing-year">Word of the Day · All rights reserved</div>
+    </div>
+    <div class="end-spacer"></div>
+  </div>
+</div>
+
+<div id="controls">
+  <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+  <button class="ctrl-btn" onclick="adjustSpeed(-1)">Slower</button>
+  <button class="ctrl-btn" onclick="adjustSpeed(1)">Faster</button>
+  <button class="ctrl-btn" onclick="shuffleCredits()">⇄ Shuffle</button>
+  <button class="ctrl-btn" onclick="restartCredits()">↺ Restart</button>
+  <button class="ctrl-btn" onclick="openSelector()">Word List</button>
+</div>
+
+<div id="selector-overlay">
+  <div class="sel-title">Select a Word</div>
+  <div class="sel-rule"></div>
+  <div class="sel-sub">tap to start from that word</div>
+  <div class="chips-grid">
+<div class="chip" onclick="jumpToWord(0)">abdicate</div><div class="chip" onclick="jumpToWord(1)">abide</div><div class="chip" onclick="jumpToWord(2)">ad hoc</div><div class="chip" onclick="jumpToWord(3)">adulation</div><div class="chip" onclick="jumpToWord(4)">alacrity</div><div class="chip" onclick="jumpToWord(5)">alchemy</div><div class="chip" onclick="jumpToWord(6)">alleviate</div><div class="chip" onclick="jumpToWord(7)">amalgamate</div><div class="chip" onclick="jumpToWord(8)">amortize</div><div class="chip" onclick="jumpToWord(9)">apotheosis</div><div class="chip" onclick="jumpToWord(10)">apropos</div><div class="chip" onclick="jumpToWord(11)">arbitrary</div><div class="chip" onclick="jumpToWord(12)">aspersions</div><div class="chip" onclick="jumpToWord(13)">astrolabe</div><div class="chip" onclick="jumpToWord(14)">audacious</div><div class="chip" onclick="jumpToWord(15)">besmirch</div><div class="chip" onclick="jumpToWord(16)">besotted</div><div class="chip" onclick="jumpToWord(17)">bespoke</div><div class="chip" onclick="jumpToWord(18)">bloviate</div><div class="chip" onclick="jumpToWord(19)">brackish</div><div class="chip" onclick="jumpToWord(20)">bravado</div><div class="chip" onclick="jumpToWord(21)">brevity</div><div class="chip" onclick="jumpToWord(22)">bromide</div><div class="chip" onclick="jumpToWord(23)">cadence</div><div class="chip" onclick="jumpToWord(24)">cadge</div><div class="chip" onclick="jumpToWord(25)">cajole</div><div class="chip" onclick="jumpToWord(26)">canoodle</div><div class="chip" onclick="jumpToWord(27)">charisma</div><div class="chip" onclick="jumpToWord(28)">cloying</div><div class="chip" onclick="jumpToWord(29)">coalesce</div><div class="chip" onclick="jumpToWord(30)">collude</div><div class="chip" onclick="jumpToWord(31)">conciliatory</div><div class="chip" onclick="jumpToWord(32)">congruous</div><div class="chip" onclick="jumpToWord(33)">conversant</div><div class="chip" onclick="jumpToWord(34)">cornucopia</div><div class="chip" onclick="jumpToWord(35)">crepuscular</div><div class="chip" onclick="jumpToWord(36)">crucible</div><div class="chip" onclick="jumpToWord(37)">culminate</div><div class="chip" onclick="jumpToWord(38)">decorous</div><div class="chip" onclick="jumpToWord(39)">deem</div><div class="chip" onclick="jumpToWord(40)">defenestration</div><div class="chip" onclick="jumpToWord(41)">delegate</div><div class="chip" onclick="jumpToWord(42)">deliquesce</div><div class="chip" onclick="jumpToWord(43)">desolate</div><div class="chip" onclick="jumpToWord(44)">diaphanous</div><div class="chip" onclick="jumpToWord(45)">disheveled</div><div class="chip" onclick="jumpToWord(46)">doughty</div><div class="chip" onclick="jumpToWord(47)">dross</div><div class="chip" onclick="jumpToWord(48)">eccentric</div><div class="chip" onclick="jumpToWord(49)">elicit</div><div class="chip" onclick="jumpToWord(50)">emancipation</div><div class="chip" onclick="jumpToWord(51)">eminently</div><div class="chip" onclick="jumpToWord(52)">encapsulate</div><div class="chip" onclick="jumpToWord(53)">endemic</div><div class="chip" onclick="jumpToWord(54)">enigmatic</div><div class="chip" onclick="jumpToWord(55)">ephemeral</div><div class="chip" onclick="jumpToWord(56)">Erin go bragh</div><div class="chip" onclick="jumpToWord(57)">espouse</div><div class="chip" onclick="jumpToWord(58)">euphoria</div><div class="chip" onclick="jumpToWord(59)">eureka</div><div class="chip" onclick="jumpToWord(60)">exculpatory</div><div class="chip" onclick="jumpToWord(61)">exhilarate</div><div class="chip" onclick="jumpToWord(62)">febrile</div><div class="chip" onclick="jumpToWord(63)">fidelity</div><div class="chip" onclick="jumpToWord(64)">fiduciary</div><div class="chip" onclick="jumpToWord(65)">fiscal</div><div class="chip" onclick="jumpToWord(66)">foray</div><div class="chip" onclick="jumpToWord(67)">fortitude</div><div class="chip" onclick="jumpToWord(68)">fortuitous</div><div class="chip" onclick="jumpToWord(69)">frenetic</div><div class="chip" onclick="jumpToWord(70)">frolic</div><div class="chip" onclick="jumpToWord(71)">frowsy</div><div class="chip" onclick="jumpToWord(72)">gargantuan</div><div class="chip" onclick="jumpToWord(73)">garner</div><div class="chip" onclick="jumpToWord(74)">gauche</div><div class="chip" onclick="jumpToWord(75)">Goldilocks</div><div class="chip" onclick="jumpToWord(76)">grandiose</div><div class="chip" onclick="jumpToWord(77)">grift</div><div class="chip" onclick="jumpToWord(78)">gumbo</div><div class="chip" onclick="jumpToWord(79)">hark back</div><div class="chip" onclick="jumpToWord(80)">hector</div><div class="chip" onclick="jumpToWord(81)">heyday</div><div class="chip" onclick="jumpToWord(82)">hibernaculum</div><div class="chip" onclick="jumpToWord(83)">hobgoblin</div><div class="chip" onclick="jumpToWord(84)">hornswoggle</div><div class="chip" onclick="jumpToWord(85)">iconoclast</div><div class="chip" onclick="jumpToWord(86)">imbue</div><div class="chip" onclick="jumpToWord(87)">imprimatur</div><div class="chip" onclick="jumpToWord(88)">innocuous</div><div class="chip" onclick="jumpToWord(89)">inoculate</div><div class="chip" onclick="jumpToWord(90)">jaunty</div><div class="chip" onclick="jumpToWord(91)">jejune</div><div class="chip" onclick="jumpToWord(92)">knackered</div><div class="chip" onclick="jumpToWord(93)">laconic</div><div class="chip" onclick="jumpToWord(94)">leviathan</div><div class="chip" onclick="jumpToWord(95)">libertine</div><div class="chip" onclick="jumpToWord(96)">loll</div><div class="chip" onclick="jumpToWord(97)">lout</div><div class="chip" onclick="jumpToWord(98)">marginalia</div><div class="chip" onclick="jumpToWord(99)">mea culpa</div><div class="chip" onclick="jumpToWord(100)">meme</div><div class="chip" onclick="jumpToWord(101)">menagerie</div><div class="chip" onclick="jumpToWord(102)">metonymy</div><div class="chip" onclick="jumpToWord(103)">multitudinous</div><div class="chip" onclick="jumpToWord(104)">nadir</div><div class="chip" onclick="jumpToWord(105)">nefarious</div><div class="chip" onclick="jumpToWord(106)">nettle</div><div class="chip" onclick="jumpToWord(107)">noel</div><div class="chip" onclick="jumpToWord(108)">notorious</div><div class="chip" onclick="jumpToWord(109)">oaf</div><div class="chip" onclick="jumpToWord(110)">onomatopoeia</div><div class="chip" onclick="jumpToWord(111)">ostracize</div><div class="chip" onclick="jumpToWord(112)">paean</div><div class="chip" onclick="jumpToWord(113)">paradox</div><div class="chip" onclick="jumpToWord(114)">perdition</div><div class="chip" onclick="jumpToWord(115)">peremptory</div><div class="chip" onclick="jumpToWord(116)">preeminent</div><div class="chip" onclick="jumpToWord(117)">prerogative</div><div class="chip" onclick="jumpToWord(118)">prescience</div><div class="chip" onclick="jumpToWord(119)">pseudonym</div><div class="chip" onclick="jumpToWord(120)">putative</div><div class="chip" onclick="jumpToWord(121)">quiddity</div><div class="chip" onclick="jumpToWord(122)">radial</div><div class="chip" onclick="jumpToWord(123)">rapscallion</div><div class="chip" onclick="jumpToWord(124)">rash</div><div class="chip" onclick="jumpToWord(125)">reciprocate</div><div class="chip" onclick="jumpToWord(126)">resplendent</div><div class="chip" onclick="jumpToWord(127)">retrospective</div><div class="chip" onclick="jumpToWord(128)">salubrious</div><div class="chip" onclick="jumpToWord(129)">sartorial</div><div class="chip" onclick="jumpToWord(130)">schmooze</div><div class="chip" onclick="jumpToWord(131)">scrutinize</div><div class="chip" onclick="jumpToWord(132)">senescence</div><div class="chip" onclick="jumpToWord(133)">sensibility</div><div class="chip" onclick="jumpToWord(134)">serendipity</div><div class="chip" onclick="jumpToWord(135)">short shrift</div><div class="chip" onclick="jumpToWord(136)">spiel</div><div class="chip" onclick="jumpToWord(137)">spontaneous</div><div class="chip" onclick="jumpToWord(138)">sustain</div><div class="chip" onclick="jumpToWord(139)">syllogism</div><div class="chip" onclick="jumpToWord(140)">tabula rasa</div><div class="chip" onclick="jumpToWord(141)">temerity</div><div class="chip" onclick="jumpToWord(142)">temporize</div><div class="chip" onclick="jumpToWord(143)">titanic</div><div class="chip" onclick="jumpToWord(144)">truculent</div><div class="chip" onclick="jumpToWord(145)">umbrage</div><div class="chip" onclick="jumpToWord(146)">umpteen</div><div class="chip" onclick="jumpToWord(147)">unabashed</div><div class="chip" onclick="jumpToWord(148)">undulate</div><div class="chip" onclick="jumpToWord(149)">vamoose</div><div class="chip" onclick="jumpToWord(150)">vaunted</div><div class="chip" onclick="jumpToWord(151)">vendetta</div><div class="chip" onclick="jumpToWord(152)">veracity</div><div class="chip" onclick="jumpToWord(153)">vertiginous</div><div class="chip" onclick="jumpToWord(154)">waggish</div><div class="chip" onclick="jumpToWord(155)">writhe</div><div class="chip" onclick="jumpToWord(156)">yen</div><div class="chip" onclick="jumpToWord(157)">zany</div>
+  </div>
+  <button class="sel-close" onclick="closeSelector()">Close</button>
+</div>
+
+<script>
+var track = document.getElementById('track');
+var paused = false;
+var speedFactor = 1.0;
+var currentY = window.innerHeight;
+var pxPerSec = 50;
+var lastTime = null;
+
+function animate(ts) {
+  if (!lastTime) lastTime = ts;
+  var dt = (ts - lastTime) / 1000;
+  lastTime = ts;
+  if (!paused) {
+    currentY -= pxPerSec * speedFactor * dt;
+    track.style.transform = 'translateY(' + currentY + 'px)';
+    if (currentY < -(track.offsetHeight)) currentY = window.innerHeight;
+  }
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+
+function togglePause() {
+  paused = !paused;
+  lastTime = null;
+  document.getElementById('pauseBtn').textContent = paused ? '▶ Play' : '⏸ Pause';
+}
+function adjustSpeed(dir) {
+  speedFactor = Math.max(0.2, Math.min(5, speedFactor + dir * 0.3));
+}
+function restartCredits() {
+  currentY = window.innerHeight;
+  track.style.transform = 'translateY(' + currentY + 'px)';
+  paused = false; lastTime = null;
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+}
+function shuffleCredits() {
+  var wl = document.getElementById('word-list');
+  var blocks = Array.from(wl.querySelectorAll('.word-block'));
+  for (var i = blocks.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    wl.appendChild(blocks[j]);
+    var tmp = blocks[i]; blocks[i] = blocks[j]; blocks[j] = tmp;
+  }
+  restartCredits();
+}
+function jumpToWord(idx) {
+  var el = document.getElementById('word-' + idx);
+  if (!el) return;
+  currentY = window.innerHeight / 2 - el.offsetTop;
+  track.style.transform = 'translateY(' + currentY + 'px)';
+  paused = false; lastTime = null;
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  closeSelector();
+}
+function openSelector() { document.getElementById('selector-overlay').classList.add('open'); }
+function closeSelector() { document.getElementById('selector-overlay').classList.remove('open'); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space') { e.preventDefault(); togglePause(); }
+  if (e.key === 'ArrowUp') adjustSpeed(1);
+  if (e.key === 'ArrowDown') adjustSpeed(-1);
+  if (e.key === 'r' || e.key === 'R') restartCredits();
+  if (e.key === 'Escape') closeSelector();
+  if (e.key === 'l' || e.key === 'L') openSelector();
+});
+</script>
+</body>
+</html>
