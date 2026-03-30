@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🍃 Word of the Day — Flashcards</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-light: #a8d5a2;
+  --green-mid: #6ab04c;
+  --green-dark: #4a8c3f;
+  --brown-light: #e8c9a0;
+  --brown-mid: #c49a6c;
+  --brown-dark: #8b6140;
+  --cream: #fdf6e3;
+  --sky: #b8e0f7;
+  --sky-dark: #7ec8e3;
+  --yellow: #f9e04b;
+  --red: #e07070;
+  --text-dark: #3d2b1f;
+  --text-mid: #6b4c36;
+  --shadow: rgba(61,43,31,0.18);
+  --card-front: #fffef5;
+  --card-back: #f0fae8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background: var(--green-light);
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text-dark);
+  position: relative;
+}
+
+/* Grass pattern background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 60px 30px at 10% 95%, #7dc266 50%, transparent 50%),
+    radial-gradient(ellipse 50px 25px at 30% 96%, #6ab04c 50%, transparent 50%),
+    radial-gradient(ellipse 70px 32px at 55% 95%, #7dc266 50%, transparent 50%),
+    radial-gradient(ellipse 45px 22px at 75% 96%, #6ab04c 50%, transparent 50%),
+    radial-gradient(ellipse 60px 28px at 92% 95%, #7dc266 50%, transparent 50%),
+    linear-gradient(180deg, var(--sky) 0%, #c8edf5 12%, var(--green-light) 12%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Floating clouds */
+.cloud {
+  position: fixed;
+  top: 3%;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.85);
+  animation: floatCloud linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+.c1 { width: 80px; height: 26px; left: -100px; top: 3%; animation-duration: 35s; animation-delay: -5s; }
+.c1::before { width: 36px; height: 36px; top: -18px; left: 10px; }
+.c1::after { width: 28px; height: 28px; top: -14px; left: 34px; }
+.c2 { width: 60px; height: 20px; left: -80px; top: 7%; animation-duration: 45s; animation-delay: -15s; }
+.c2::before { width: 26px; height: 26px; top: -13px; left: 8px; }
+.c2::after { width: 20px; height: 20px; top: -10px; left: 26px; }
+.c3 { width: 100px; height: 30px; left: -120px; top: 1%; animation-duration: 55s; animation-delay: -30s; }
+.c3::before { width: 44px; height: 44px; top: -22px; left: 12px; }
+.c3::after { width: 34px; height: 34px; top: -17px; left: 44px; }
+@keyframes floatCloud {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* Floating leaves */
+.leaf {
+  position: fixed;
+  font-size: 1.4rem;
+  animation: fallLeaf linear infinite;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+@keyframes fallLeaf {
+  0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Main wrapper */
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px 40px;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  max-width: 560px;
+  background: var(--brown-light);
+  border: 3px solid var(--brown-dark);
+  border-radius: 0 0 24px 24px;
+  padding: 14px 20px 16px;
+  text-align: center;
+  box-shadow: 0 4px 0 var(--brown-dark), 0 6px 16px var(--shadow);
+  margin-bottom: 20px;
+  position: relative;
+}
+.header-icon { font-size: 2rem; display: block; margin-bottom: 2px; }
+.header h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--brown-dark);
+  letter-spacing: 0.02em;
+}
+.header-sub {
+  font-size: 0.75rem;
+  color: var(--text-mid);
+  margin-top: 2px;
+}
+
+/* Stats bar */
+.stats-bar {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+.stat-pill {
+  background: rgba(255,255,255,0.75);
+  border: 2px solid var(--brown-mid);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.stat-pill span { color: var(--green-dark); }
+.progress-wrap {
+  flex: 1;
+  height: 14px;
+  background: rgba(255,255,255,0.7);
+  border: 2px solid var(--brown-mid);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-mid), var(--green-dark));
+  border-radius: 20px;
+  transition: width 0.4s ease;
+  min-width: 6px;
+}
+
+/* Controls row */
+.controls {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.btn {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid;
+  border-radius: 14px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn:active { transform: scale(0.95) translateY(2px); box-shadow: none !important; }
+.btn-brown {
+  background: var(--brown-light);
+  border-color: var(--brown-dark);
+  color: var(--brown-dark);
+  box-shadow: 0 3px 0 var(--brown-dark);
+}
+.btn-green {
+  background: #d4f0c8;
+  border-color: var(--green-dark);
+  color: var(--green-dark);
+  box-shadow: 0 3px 0 var(--green-dark);
+}
+.btn-sky {
+  background: var(--sky);
+  border-color: var(--sky-dark);
+  color: #2d7a9a;
+  box-shadow: 0 3px 0 var(--sky-dark);
+}
+.btn-yellow {
+  background: #fff4c2;
+  border-color: #c8a020;
+  color: #7a5c00;
+  box-shadow: 0 3px 0 #c8a020;
+}
+.btn-active-green {
+  background: var(--green-mid) !important;
+  color: white !important;
+  border-color: var(--green-dark) !important;
+}
+
+/* Card scene */
+.card-scene {
+  width: 100%;
+  max-width: 520px;
+  perspective: 1200px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.card-3d {
+  width: 100%;
+  min-height: 340px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1);
+}
+.card-3d.flipped { transform: rotateY(180deg); }
+.card-face {
+  position: absolute;
+  width: 100%;
+  min-height: 340px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 24px;
+  border: 3px solid var(--brown-dark);
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 5px 0 var(--brown-dark), 0 8px 24px var(--shadow);
+}
+.card-front {
+  background: linear-gradient(160deg, #fffef5 60%, #f3f9ec);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.card-back {
+  background: linear-gradient(160deg, #f5fce8 60%, #fffef5);
+  transform: rotateY(180deg);
+  justify-content: flex-start;
+}
+
+/* Card front content */
+.card-num {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 0.7rem;
+  color: #b0976a;
+  font-weight: 700;
+}
+.card-pos-badge {
+  background: var(--brown-light);
+  border: 2px solid var(--brown-mid);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.card-word {
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.card-pron {
+  font-size: 1.0rem;
+  color: var(--text-mid);
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+.pron-label {
+  font-size: 0.65rem;
+  color: #a08060;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.card-hint {
+  font-size: 0.72rem;
+  color: #9a7a58;
+  margin-top: 16px;
+  padding: 6px 14px;
+  background: rgba(200,174,130,0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(200,174,130,0.4);
+}
+
+/* Card back content */
+.back-section {
+  margin-bottom: 12px;
+}
+.back-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--green-dark);
+  margin-bottom: 3px;
+}
+.back-def-en {
+  font-size: 0.92rem;
+  color: var(--text-dark);
+  line-height: 1.5;
+  font-weight: 700;
+}
+.back-def-ko {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin-top: 3px;
+}
+.back-example-en {
+  font-size: 0.83rem;
+  color: var(--text-dark);
+  line-height: 1.55;
+  font-style: italic;
+  background: rgba(168,213,162,0.25);
+  border-left: 3px solid var(--green-mid);
+  padding: 6px 10px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 3px;
+}
+.back-example-ko {
+  font-size: 0.8rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  font-style: italic;
+  padding: 0 10px;
+}
+.syn-ant-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.syn-ant-box {
+  flex: 1;
+  background: rgba(255,255,255,0.6);
+  border: 1.5px solid var(--brown-mid);
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+}
+.syn-ant-box .lbl {
+  font-weight: 700;
+  color: var(--brown-dark);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.syn-ant-box .val { color: var(--text-mid); }
+
+/* Navigation */
+.nav-row {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.nav-btn {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 1.4rem;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid var(--brown-dark);
+  background: var(--brown-light);
+  color: var(--brown-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 0 var(--brown-dark);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.nav-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--brown-dark); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.flip-btn {
+  flex: 1;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  height: 52px;
+  border-radius: 26px;
+  border: 3px solid var(--green-dark);
+  background: linear-gradient(180deg, #d8f5c8 0%, #b8e8a0 100%);
+  color: var(--green-dark);
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--green-dark);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.flip-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--green-dark); }
+
+/* Known/unknown buttons */
+.know-row {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.know-btn {
+  flex: 1;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  height: 44px;
+  border-radius: 22px;
+  border: 2.5px solid;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.know-btn:active { transform: scale(0.97) translateY(2px); }
+.btn-known {
+  background: #d4f0c8;
+  border-color: var(--green-dark);
+  color: var(--green-dark);
+  box-shadow: 0 3px 0 var(--green-dark);
+}
+.btn-known.marked {
+  background: var(--green-mid);
+  color: white;
+  border-color: var(--green-dark);
+}
+.btn-unknown {
+  background: #fde8e8;
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 3px 0 var(--red);
+}
+.btn-unknown.marked {
+  background: var(--red);
+  color: white;
+}
+
+/* Word list panel */
+.panel {
+  width: 100%;
+  max-width: 560px;
+  background: rgba(255,255,255,0.82);
+  border: 2.5px solid var(--brown-mid);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: none;
+}
+.panel.open { display: block; }
+.panel-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brown-dark);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.word-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--brown-mid);
+  background: var(--cream);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.word-chip:hover { background: var(--brown-light); }
+.word-chip.known-chip { border-color: var(--green-dark); background: #e8f9e0; color: var(--green-dark); }
+.word-chip.unknown-chip { border-color: var(--red); background: #fde8e8; color: var(--red); }
+.word-chip.current-chip { border-color: var(--brown-dark); background: var(--brown-light); font-weight: 800; }
+
+/* Tom Nook decorative footer */
+.deco-footer {
+  text-align: center;
+  font-size: 0.7rem;
+  color: rgba(61,43,31,0.45);
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--brown-dark);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  z-index: 999;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Responsive */
+@media (max-width: 400px) {
+  .card-word { font-size: 1.8rem; }
+  .card-face { padding: 20px 18px; }
+  .back-def-en { font-size: 0.85rem; }
+  .back-def-ko { font-size: 0.82rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Clouds -->
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<!-- Falling leaves -->
+<div class="leaf" style="left:8%;animation-duration:12s;animation-delay:0s;">🍃</div>
+<div class="leaf" style="left:25%;animation-duration:17s;animation-delay:-4s;">🍂</div>
+<div class="leaf" style="left:60%;animation-duration:14s;animation-delay:-8s;">🍃</div>
+<div class="leaf" style="left:80%;animation-duration:19s;animation-delay:-2s;">🍂</div>
+<div class="leaf" style="left:45%;animation-duration:22s;animation-delay:-11s;">🌿</div>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <span class="header-icon">🍃</span>
+    <h1>Word of the Day</h1>
+    <div class="header-sub">동물의 숲 플래시카드 · <span id="totalCount"></span>개 단어</div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-pill">✅ <span id="knownCount">0</span></div>
+    <div class="stat-pill">📌 <span id="unknownCount">0</span></div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="stat-pill" id="currentPos">1 / 89</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-brown" onclick="toggleList()">📋 목록</button>
+    <button class="btn btn-sky" id="langBtn" onclick="toggleLang()">🌏 KO·EN</button>
+    <button class="btn btn-yellow" onclick="shuffleCards()">🔀 셔플</button>
+    <button class="btn btn-green" onclick="filterMode()">🌟 모르는 것만</button>
+    <button class="btn btn-brown" onclick="resetAll()">🔄 리셋</button>
+  </div>
+
+  <!-- Card scene -->
+  <div class="card-scene" onclick="flipCard()">
+    <div class="card-3d" id="card3d">
+      <!-- Front -->
+      <div class="card-face card-front">
+        <div class="card-num" id="cardNum">1 / 89</div>
+        <div class="card-pos-badge" id="frontPos">noun</div>
+        <div class="card-word" id="frontWord">Loading...</div>
+        <div class="pron-label">PRONUNCIATION</div>
+        <div class="card-pron" id="frontPron">/loh-DIN/</div>
+        <div class="card-hint">👆 탭하여 뒤집기</div>
+      </div>
+      <!-- Back -->
+      <div class="card-face card-back">
+        <div class="card-num" id="cardNumBack">1 / 89</div>
+        <div class="back-section">
+          <div class="back-label">📖 Definition</div>
+          <div class="back-def-en" id="backDefEn"></div>
+          <div class="back-def-ko" id="backDefKo"></div>
+        </div>
+        <div class="back-section">
+          <div class="back-label">✏️ Example</div>
+          <div class="back-example-en" id="backExEn"></div>
+          <div class="back-example-ko" id="backExKo"></div>
+        </div>
+        <div class="syn-ant-row">
+          <div class="syn-ant-box">
+            <div class="lbl">≈ Synonyms</div>
+            <div class="val" id="backSyn">—</div>
+          </div>
+          <div class="syn-ant-box">
+            <div class="lbl">↔ Antonyms</div>
+            <div class="val" id="backAnt">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-row">
+    <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">◀</button>
+    <button class="flip-btn" onclick="flipCard()">🔄 카드 뒤집기</button>
+    <button class="nav-btn" id="nextBtn" onclick="navigate(1)">▶</button>
+  </div>
+
+  <!-- Known/Unknown -->
+  <div class="know-row">
+    <button class="know-btn btn-known" id="knownBtn" onclick="markKnown()">✅ 알아요!</button>
+    <button class="know-btn btn-unknown" id="unknownBtn" onclick="markUnknown()">📌 아직 몰라요</button>
+  </div>
+
+  <!-- Word list panel -->
+  <div class="panel" id="wordListPanel">
+    <div class="panel-title">📋 전체 단어 목록 — 클릭해서 바로가기</div>
+    <div class="word-grid" id="wordGrid"></div>
+  </div>
+
+  <div class="deco-footer">🦝 Tom Nook's English Academy · made with 🍃</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const WORDS = [{"word":"abdicate","pos":"verb","pronunciation":"AB-dih-kayt","en_def":"To abdicate is to renounce one's throne, or to fail to fulfill a responsibility or duty.","ko_def":"권좌를 포기하다, 책임을 저버리다","en_example":"The king abdicated the throne in favor of his younger brother.","ko_example":"왕은 동생에게 왕위를 물려주기 위해 왕위를 포기했다.","synonyms":"renounce, relinquish, resign","antonyms":"claim, assume, retain"},{"word":"abide","pos":"verb","pronunciation":"uh-BYDE","en_def":"If someone cannot abide someone or something bad, unpleasant, etc., they cannot tolerate or accept that person or thing.","ko_def":"(주로 부정문에서) 나쁘거나 불쾌한 것을 참거나 용납할 수 없다; (규칙, 결정 등을) 이의 없이 받아들이다, 따르다.","en_example":"All employees must abide by the company's code of conduct to ensure a respectful workplace.","ko_example":"모든 직원은 존중받는 직장 환경을 보장하기 위해 회사의 행동 강령을 준수해야 합니다.","synonyms":"tolerate, endure, comply","antonyms":"reject"},{"word":"ad hoc","pos":"adjective","pronunciation":"AD-HOCK","en_def":"Ad hoc describes something created or done for a particular purpose as necessary, without prior planning.","ko_def":"특정 목적을 위한 임시의","en_example":"The committee was formed on an ad hoc basis to address the sudden crisis.","ko_example":"위원회는 갑작스러운 위기에 대응하기 위해 임시로 구성되었다.","synonyms":"improvised, makeshift, provisional","antonyms":"planned, permanent, systematic"},{"word":"adulation","pos":"noun","pronunciation":"aj-uh-LAY-shun","en_def":"Adulation is excessive admiration or praise, often to a degree that seems insincere.","ko_def":"과도한 칭송, 아첨","en_example":"The young pop star was overwhelmed by the adulation of her fans.","ko_example":"젊은 팝스타는 팬들의 열광적인 찬사에 압도되었다.","synonyms":"worship, flattery, veneration","antonyms":"criticism, censure, contempt"},{"word":"alacrity","pos":"noun","pronunciation":"ə-ˈla-krə-tē","en_def":"Alacrity means prompt, eager willingness to do something.","ko_def":"민첩한 기꺼움, 신속한 응낙","en_example":"She accepted the tough assignment with alacrity.","ko_example":"그녀는 어려운 과제를 기꺼이, 재빠르게 맡았다.","synonyms":"eagerness, willingness, promptness","antonyms":"reluctance, apathy, hesitation"},{"word":"alchemy","pos":"noun","pronunciation":"AL-kuh-mee","en_def":"Alchemy refers to a power or process that changes or transforms something in a mysterious or impressive way.","ko_def":"무언가를 신비롭거나 인상적인 방식으로 변화시키거나 변형시키는 힘 또는 과정을 의미합니다. (흔히 '연금술'로 번역됩니다.)","en_example":"Through pure musical alchemy, the band turned the crowd's awkward","ko_example":"밴드는 순수한 음악적 연금술을 통해 군중의 어색한 침묵을 열광의 함성으로 바꾸어 놓았습니다.","synonyms":"magic, sorcery, transformation","antonyms":"stasis (정체, 멈춤)"},{"word":"alleviate","pos":"verb","pronunciation":"uh-LEE-vee-ayt","en_def":"To alleviate something is to make it less painful, difficult, or severe.","ko_def":"(고통, 어려움, 심각성 등을) 덜다, 완화하다, 경감하다.","en_example":"Drinking warm tea with honey can help alleviate a sore throat.","ko_example":"꿀을 넣은 따뜻한 차를 마시는 것은 인후통을 완화하는 데 도움이 될 수 있다.","synonyms":"relieve, ease, mitigate","antonyms":"aggravate"},{"word":"amalgamate","pos":"verb","pronunciation":"uh-MAL-guh-mayt","en_def":"\"to unite (two or more things) into one thing.\"","ko_def":"둘 이상의 것을 하나로 합치다, 통합하다.","en_example":"The two small tech companies decided to amalgamate to better compete with larger corporations.","ko_example":"두 소규모 기술 회사는 대기업과 더 잘 경쟁하기 위해 합병하기로 결정했다.","synonyms":"combine, merge, unite","antonyms":"separate"},{"word":"amortize","pos":"verb","pronunciation":"AM-er-tyze","en_def":"To amortize is to gradually pay off a debt over a period of time through regular payments.","ko_def":"대출금을 분할 상환하다, 감가상각하다","en_example":"The company chose to amortize the loan over twenty years to reduce monthly payments.","ko_example":"회사는 월 상환액을 줄이기 위해 대출을 20년에 걸쳐 분할 상환하기로 했다.","synonyms":"pay off, reduce, discharge","antonyms":"accrue, increase, accumulate"},{"word":"apotheosis","pos":"noun","pronunciation":"uh-pah-thee-OH-sis","en_def":"Apotheosis refers to the highest point in the development of something, or the elevation of someone to divine status.","ko_def":"절정, 완벽한 본보기","en_example":"The symphony was considered the apotheosis of his composing career.","ko_example":"그 교향곡은 그의 작곡 경력의 정점으로 여겨졌다.","synonyms":"pinnacle, peak, zenith","antonyms":"nadir, low point, downfall"},{"word":"apropos","pos":"adjective","pronunciation":"ap-ruh-POH","en_def":"Apropos means with reference to something, or very appropriate and relevant to a situation.","ko_def":"적절한, 알맞은; (전치사) ~에 관하여","en_example":"His comment about teamwork was quite apropos given the recent conflicts in the office.","ko_example":"팀워크에 대한 그의 발언은 최근 사무실 내 갈등을 고려할 때 매우 적절했다.","synonyms":"relevant, pertinent, fitting","antonyms":"irrelevant, inappropriate, unrelated"},{"word":"arbitrary","pos":"adjective","pronunciation":"AHR-buh-trair-ee","en_def":"Arbitrary describes something that is not planned or chosen for a particular reason, is not based on reason or evidence, or is done without concern for what is fair or right.","ko_def":"특정한 이유 없이 계획되거나 선택되지 않고, 이성이나 증거에 근거하지 않거나, 공정함이나 권리를 고려하지 않고 행해지는 것을 의미합니다.","en_example":"The dictator was known for making arbitrary decisions that instilled fear in the public.","ko_example":"그 독재자는 대중에게 공포심을 심어주는 임의적인 결정을 내리는 것으로 알려져 있었습니다.","synonyms":"random, capricious, irrational","antonyms":"rational"},{"word":"aspersions","pos":"noun","pronunciation":"ə-ˈspur-zhənz","en_def":"intended to injure someone's character.","ko_def":"비난, 명예훼손","en_example":"He cast aspersions on her integrity without any proof.","ko_example":"그는 아무 증거 없이 그녀의 청렴성을 의심했다.","synonyms":"slander, defamation, disparagement","antonyms":"praise, commendation, compliment"},{"word":"astrolabe","pos":"noun","pronunciation":"-struh","en_def":"An astrolabe is a compact instrument used to observe and calculate the position of celestial bodies before the invention of the sextant.","ko_def":"아스트롤라베(천체 관측 의기)는 육분의가 발명되기 전, 천체의 위치를 관측하고 계산하는 데 사용된 소형 기구입니다.","en_example":"Ancient mariners relied on the astrolabe to navigate the vast oceans by","ko_example":"고대 선원들은 별의 고도를 측정하여 넓은 바다를 항해하기 위해 아스트롤라베에 의존했습니다.","synonyms":"sextant, quadrant, planisphere","antonyms":"GPS (기능적 대척점)"},{"word":"audacious","pos":"adjective","pronunciation":"aw-DAY-shus","en_def":"Audacious describes someone fearlessly bold or willing to take","ko_def":"대담한, 뻔뻔할 정도로 용감한","en_example":"The team's audacious plan to colonize Mars captured global attention.","ko_example":"그 팀의 화성 식민지화 계획은 전 세계의 관심을 끌었다.","synonyms":"bold, daring, fearless","antonyms":"timid, cowardly, cautious"},{"word":"besmirch","pos":"verb","pronunciation":"bih-SMERCH","en_def":"To besmirch someone is to damage or destroy their reputation by saying unpleasant things about them.","ko_def":"평판이나 명예를 더럽히다","en_example":"The false accusations were designed to besmirch his good name.","ko_example":"그 거짓 고발은 그의 명성을 더럽히기 위한 것이었다.","synonyms":"tarnish, sully, defame","antonyms":"honor, praise, commend"},{"word":"besotted","pos":"adjective","pronunciation":"bih-SAH-tud","en_def":"Besotted describes someone who is so strongly attracted to someone or something that they cannot think clearly.","ko_def":"사랑에 푹 빠진","en_example":"He was so besotted with her that he forgot all his responsibilities.","ko_example":"그는 그녀에게 완전히 빠져들어 모든 책임을 잊어버렸다.","synonyms":"infatuated, smitten, enamored","antonyms":"indifferent, detached, uninterested"},{"word":"bespoke","pos":"adjective","pronunciation":"bih-SPOHK","en_def":"Bespoke describes something made to a customer's individual specifications, especially clothing.","ko_def":"맞춤형, 특정 개인의 요구에 맞춘","en_example":"He wore a bespoke suit that had been tailored specifically for his body.","ko_example":"그는 자신의 체형에 맞춰 맞춤 제작된 정장을 입었다.","synonyms":"custom-made, tailored, personalized","antonyms":"mass-produced, generic, off-the-shelf"},{"word":"bloviate","pos":"verb","pronunciation":"BLOH-vee-ayt","en_def":"To speak or write in an arrogant tone and with more words than are necessary.","ko_def":"거만한 어조로 필요 이상으로 장황하게 말하거나 글을 쓰다.","en_example":"The politician was known to bloviate for hours, yet say nothing of substance.","ko_example":"그 정치인은 몇 시간이고 장황하게 연설했지만, 실속 있는 내용은 전혀 없는 것으로 유명했다.","synonyms":"pontificate, rant, declaim","antonyms":"be succinct"},{"word":"brackish","pos":"adjective","pronunciation":"BRACK-ish","en_def":"Meaning \"somewhat salty,\" usually describes water or bodies of water, such as rivers, lakes, and estuaries.","ko_def":"'약간 짠'이라는 뜻으로, 주로 강이나 호수, 강과 바다가 만나는 하구(estuary)와 같은 물이나 수역을 묘사할 때 쓰입니다. (또한 맛이 없거나 불쾌하다는 의미로도 사용됩니다.)","en_example":"Mangroves thrive in brackish water, where the fresh river water mixes","ko_example":"맹그로브는 강물과 바닷물이 섞이는 염분이 있는 물에서 잘 자랍니다.","synonyms":"briny (짠), saline (염분이 함유된), salty (짠)","antonyms":"fresh (민물의, 담수의)"},{"word":"bravado","pos":"noun","pronunciation":"bruh-VAH-doh","en_def":"Bravado refers to confident or brave talk or behavior that is intended to impress other people.","ko_def":"다른 사람들에게 깊은 인상을 주기 위한 자신만만하거나 용감한 척하는 말이나 행동 (허세).","en_example":"Despite his outward bravado, he was trembling with fear inside regarding","ko_example":"겉으로는 허세를 부렸지만, 그는 다가오는 면접 생각에 속으로 두려움에 떨고 있었다.","synonyms":"swagger, bluster, boastfulness","antonyms":"modesty"},{"word":"brevity","pos":"noun","pronunciation":"BREH-vuh-tee","en_def":"Brevity means using few words to express much, or shortness in time.","ko_def":"간결함, 짧음","en_example":"Brevity is key in executive summaries.","ko_example":"경영 요약서에서 간결함은 핵심이다.","synonyms":"conciseness, terseness, succinctness","antonyms":"verbosity, wordiness, prolixity"},{"word":"bromide","pos":"noun","pronunciation":"BROH-myde","en_def":"A bromide is a statement intended to make someone feel happier or calmer, but too dull and unoriginal to be effective.","ko_def":"사람을 위로하거나 진정시키려는 의도지만, 너무 진부하고 독창성이 없어 효과가 없는 말.","en_example":"Tired of hearing the same old political bromides, the citizens demanded concrete action instead of empty promises.","ko_example":"낡아빠진 정치적 상투어구에 싫증이 난 시민들은, 공허한 약속 대신 구체적인 행동을 요구했습니다.","synonyms":"cliché, platitude, truism","antonyms":"insight"},{"word":"cadence","pos":"noun","pronunciation":"KAY-dunss","en_def":"Cadence refers to a rhythmic sequence or flow of sounds, or the rise and fall of a voice in speech.","ko_def":"리듬감 있는 반복적 움직임이나 억양","en_example":"The poet's cadence was so musical that the audience was completely captivated.","ko_example":"시인의 리듬감 있는 낭독은 청중을 완전히 사로잡았다.","synonyms":"rhythm, tempo, beat","antonyms":"arrhythmia, discord, irregularity"},{"word":"cadge","pos":"verb","pronunciation":"KAJ","en_def":"To cadge is to ask someone for something in a way that takes advantage of their generosity.","ko_def":"누군가를 설득하여 무언가를 공짜로 얻어내다","en_example":"He was always trying to cadge a free meal from his more successful friends.","ko_example":"그는 항상 더 성공한 친구들에게서 공짜 식사를 얻으려 했다.","synonyms":"beg, scrounge, sponge","antonyms":"give, donate, provide"},{"word":"cajole","pos":"verb","pronunciation":"kuh-JOHL","en_def":"To cajole someone is to use flattery or gentle urging to persuade them to do something or to give you something.","ko_def":"아첨이나 부드러운 권유로 누군가를 설득하여 무언가를 하거나 얻어내는 것.","en_example":"The child tried to cajole his mother into buying him a new toy by promising to be good.","ko_example":"그 아이는 착하게 굴겠다고 약속하며 엄마를 구슬려 새 장난감을 사달라고 했다.","synonyms":"coax, wheedle, persuade","antonyms":"force"},{"word":"canoodle","pos":"verb","pronunciation":"kuh-NOO-dul","en_def":"To canoodle is to kiss and cuddle amorously with someone.","ko_def":"다정하게 껴안고 입맞추다","en_example":"The couple were canoodling in the corner, oblivious to everyone around them.","ko_example":"그 커플은 주변 사람들을 전혀 의식하지 못한 채 구석에서 애정을 나누고 있었다.","synonyms":"cuddle, embrace, nuzzle","antonyms":"ignore, repel, avoid"},{"word":"charisma","pos":"noun","pronunciation":"kuh-RIZ-muh","en_def":"Charisma is a compelling attractiveness or charm that can inspire devotion in others.","ko_def":"사람을 매료시키는 특별한 매력","en_example":"Her natural charisma made her the most popular candidate in the election.","ko_example":"그녀의 타고난 카리스마는 선거에서 그녀를 가장 인기 있는 후보로 만들었다.","synonyms":"charm, magnetism, allure","antonyms":"repulsion, dullness, coldness"},{"word":"cloying","pos":"adjective","pronunciation":"KLOY-ing","en_def":"Cloying is used disapprovingly to describe something that is too sweet, pleasant, or sentimental.","ko_def":"지나치게 달거나, 상냥하거나, 감상적이어서 불쾌감을 주거나 질리게 하는 것을 나타냅니다.","en_example":"The movie's ending was so cloying that it felt more like a cheesy","ko_example":"그 영화의 결말은 지나치게 감상적이고 오글거려서 진지한 드라마라기보다는 유치한 광고처럼 느껴졌다.","synonyms":"saccharine, mawkish, syrupy","antonyms":"refreshing"},{"word":"coalesce","pos":"verb","pronunciation":"koh-uh-LESS","en_def":"Coalesce means to unite or merge into a single entity.","ko_def":"합쳐지다, 융합되다","en_example":"The club's projects gave students a goal to coalesce around.","ko_example":"동아리의 프로젝트는 학생들을 하나로 묶는 목표가 되었다.","synonyms":"merge, unite, combine","antonyms":"separate, divide, split"},{"word":"collude","pos":"verb","pronunciation":"kuh-LOOD","en_def":"To collude is to cooperate secretly or illegally in order to deceive or cheat others.","ko_def":"불법적인 일을 위해 비밀리에 공모하다","en_example":"The two companies were found to have colluded to fix prices in the market.","ko_example":"두 회사는 시장에서 가격을 담합하기 위해 공모한 것으로 밝혀졌다.","synonyms":"conspire, connive, scheme","antonyms":"compete, oppose, act independently"},{"word":"conciliatory","pos":"adjective","pronunciation":"kən-ˈsil-yə-ˌtȯr-ē","en_def":"Conciliatory describes words or actions meant to calm anger or repair","ko_def":"화해를 위한, 달래는","en_example":"Her conciliatory smile helped ease the tension in the room.","ko_example":"그녀의 화해적인 미소가 방 안의 긴장을 누그러뜨렸다.","synonyms":"appeasing, placatory, diplomatic","antonyms":"provocative, inflammatory, hostile"},{"word":"congruous","pos":"adjective","pronunciation":"KAHNG-groo-us","en_def":"Congruous describes something that is in agreement or harmony with its surroundings or other things.","ko_def":"조화로운, 일치하는","en_example":"The modern building was not congruous with the historic neighborhood around it.","ko_example":"그 현대식 건물은 주변의 역사적인 동네와 어울리지 않았다.","synonyms":"compatible, consistent, harmonious","antonyms":"incongruous, inconsistent, incompatible"},{"word":"conversant","pos":"adjective","pronunciation":"kun-VER-sunt","en_def":"Describes someone who has knowledge of or experience with something.","ko_def":"어떤 주제나 분야에 대해 지식이 있거나 경험이 있어 정통한 (잘 알고 있는).","en_example":"She is thoroughly conversant with the company's new safety regulations.","ko_example":"그녀는 회사의 새로운 안전 규정에 대해 완전히 정통해 있다.","synonyms":"knowledgeable, familiar, versed","antonyms":"unfamiliar"},{"word":"cornucopia","pos":"noun","pronunciation":"kor-nuh-KOH-pee-uh","en_def":"The word cornucopia is today more often encountered in its metaphorical use referring to an overflowing abundance, or to a seemingly inexhaustible amount of something.","ko_def":"오늘날 'cornucopia'라는 단어는 넘쳐나는 풍요로움이나 고갈되지 않을 것처럼 보이는 엄청난 양을 비유적으로 표현하는 데 더 자주 사용됩니다.","en_example":"The new streaming service offers a cornucopia of movies and TV shows for every taste.","ko_example":"그 새로운 스트리밍 서비스는 모든 취향에 맞는 영화와 TV 프로그램을 풍부하게 제공합니다.","synonyms":"abundance, plethora, profusion","antonyms":"scarcity"},{"word":"crepuscular","pos":"adjective","pronunciation":"krih-PUHSS-kyuh-ler","en_def":"Crepuscular relates to twilight, or describes animals that are active during the periods of dawn and dusk.","ko_def":"황혼과 관련된","en_example":"Deer are crepuscular animals, most often seen grazing at dawn or dusk.","ko_example":"사슴은 새벽이나 황혼 무렵에 가장 자주 풀을 뜯는 박명박모 동물이다.","synonyms":"twilight, dim, dusky","antonyms":"diurnal, bright, midday"},{"word":"crucible","pos":"noun","pronunciation":"KROO-suh-bul","en_def":"A pot in which metals or other substances are heated to a very high temperature or melted; also, a difficult test or challenge.","ko_def":"금속이나 다른 물질을 매우 높은 온도로 가열하거나 녹이는 데 쓰는 냄비; 또는 혹독한 시련이나 시험.","en_example":"The young leader's character was forged in the crucible of political crisis.","ko_example":"그 젊은 지도자의 인격은 정치적 위기라는 혹독한 시련 속에서 형성되었다.","synonyms":"trial, ordeal, test","antonyms":"comfort"},{"word":"culminate","pos":"verb","pronunciation":"KUL-muh-nayt","en_def":"To culminate means to reach a climax or point of highest development.","ko_def":"절정에 이르다, 결국 ~로 귀결되다","en_example":"Years of hard training culminated in her winning the gold medal.","ko_example":"수년간의 혹독한 훈련이 그녀의 금메달 획득으로 결실을 맺었다.","synonyms":"peak, climax, conclude","antonyms":"begin, start, initiate"},{"word":"decorous","pos":"adjective","pronunciation":"DECK-er-us","en_def":"Decorous is a formal adjective used to describe an attitude or behavior characterized by propriety and good taste.","ko_def":"예의와 품격을 갖춘 태도나 행동을 묘사할 때 쓰이는 격식 있는 형용사입니다.","en_example":"Despite the heated disagreement, both sides managed to keep the debate","ko_example":"격렬한 의견 차이에도 불구하고, 양측은 토론을 예의 바르고 정중하게 유지해냈습니다.","synonyms":"proper, polite, dignified","antonyms":"improper"},{"word":"deem","pos":"verb","pronunciation":"DEEM","en_def":"To deem something is to regard or consider it in a specified way.","ko_def":"생각하다, 판단하다","en_example":"The judge deemed the evidence insufficient to support a conviction.","ko_example":"판사는 그 증거가 유죄 판결을 뒷받침하기에 불충분하다고 판단했다.","synonyms":"consider, regard, judge","antonyms":"disregard, ignore, overlook"},{"word":"defenestration","pos":"noun","pronunciation":"dee-feh-nuh-STRAY-shun","en_def":"Defenestration literally means \"throwing out of a window,\" and","ko_def":"창문 밖으로 던지기; (비유적으로) 내쫓기","en_example":"The protest led to the defenestration of the unpopular mayor.","ko_example":"그 시위로 인해 인기가 없던 시장이 자리에서 쫓겨났다.","synonyms":"expulsion, removal, ousting","antonyms":"reinstatement, restoration, appointment"},{"word":"delegate","pos":"verb","pronunciation":"DEL-uh-gayt","en_def":"To delegate something (such as control, responsibility, authority, or a job or duty) is to trust someone else with it.","ko_def":"(책임, 권한, 업무 등을) 다른 사람에게 믿고 맡기다[위임하다].","en_example":"A good manager knows how to effectively delegate tasks to team members","ko_example":"훌륭한 관리자는 생산성을 높이기 위해 팀원들에게 업무를 효과적으로 위임하는 법을 안다.","synonyms":"assign, entrust, authorize","antonyms":"retain"},{"word":"deliquesce","pos":"verb","pronunciation":"del-ih-KWESS","en_def":"to dissolve or melt away","ko_def":"녹거나 용해되어 없어지다","en_example":"The sugar cube, left out on the humid counter, began to deliquesce into a sticky puddle.","ko_example":"습한 조리대 위에 놓인 각설탕이 끈적한 웅덩이로 녹아내리기 시작했다.","synonyms":"dissolve, melt, liquefy","antonyms":"solidify"},{"word":"desolate","pos":"adjective","pronunciation":"DESS-uh-lut","en_def":"Describes places that are deserted or barren; can also mean \"joyless\" or \"gloomy.\"","ko_def":"사람이나 동식물이 없어 황량하고 적막한; 기쁨이 없고 음울한 상태를 의미합니다.","en_example":"After the gold rush ended, it became a desolate ghost town with only the wind whistling through empty buildings.","ko_example":"골드러시가 끝난 후, 그곳은 텅 빈 건물들 사이로 바람 소리만 들리는 황량한 유령 도시가 되었습니다.","synonyms":"barren, bleak, stark","antonyms":"vibrant"},{"word":"diaphanous","pos":"adjective","pronunciation":"dye-AF-uh-nus","en_def":"Diaphanous is a formal word used to describe fabric of a texture so fine that one can see through it.","ko_def":"아주 얇고 섬세해서 뒤가 비칠 정도로 투명한 천이나 질감을 묘사하는 격식 있는 단어입니다.","en_example":"The dragonfly's diaphanous wings shimmered beautifully in the morning sunlight.","ko_example":"잠자리의 아주 얇고 투명한 날개가 아침 햇살을 받아 아름답게 반짝였습니다.","synonyms":"sheer (속이 비치는), gossamer (아주 얇은), translucent","antonyms":"opaque (불투명한)"},{"word":"disheveled","pos":"adjective","pronunciation":"dih-SHEV-uld","en_def":"A disheveled person or thing is not neat or tidy.","ko_def":"사람이나 사물이 단정하지 않거나 헝클어진 상태를 의미합니다.","en_example":"After running through the heavy rain without an umbrella, she walked","ko_example":"우산 없이 폭우 속을 달린 후, 그녀는 완전히 헝클어진 모습으로 사무실에 걸어 들어왔다.","synonyms":"unkempt, messy, untidy","antonyms":"neat"},{"word":"doughty","pos":"adjective","pronunciation":"DOW-tee","en_def":"Doughty is a word with an old-fashioned flair used to describe someone who is brave, strong, and determined.","ko_def":"용감하고, 강하며, 결단력 있는 사람을 묘사하는 데 사용되는 고풍스러운 느낌의 단어.","en_example":"The doughty little startup challenged the industry giant and eventually won the market share.","ko_example":"그 용맹한 작은 스타트업은 업계의 거물에게 도전하여 결국 시장 점유율을 차지했습니다.","synonyms":"valiant, fearless, resolute","antonyms":"cowardly"},{"word":"dross","pos":"noun","pronunciation":"DRAHSS","en_def":"Dross refers to something regarded as worthless rubbish, or the scum that forms on molten metal.","ko_def":"가치가 낮거나 품질이 저하된 것, 불순물","en_example":"After the editing process, most of what remained was pure dross.","ko_example":"편집 과정 후 남은 것의 대부분은 완전한 쓰레기였다.","synonyms":"rubbish, waste, refuse","antonyms":"treasure, gem, masterpiece"},{"word":"eccentric","pos":"adjective","pronunciation":"ik-SEN-trik","en_def":"Eccentric usually describes people and things that deviate from conventional or accepted usage or behavior, especially in odd or whimsical ways.","ko_def":"특히 이상하거나 엉뚱한 방식으로 관습적이거나 통용되는 용법이나 행동에서 벗어나는 것을 의미합니다.","en_example":"The old mansion was filled with the eccentric inventions of its former owner.","ko_example":"그 낡은 대저택은 이전 주인의 기이한 발명품들로 가득 차 있었습니다.","synonyms":"unconventional, peculiar, bizarre","antonyms":"conventional"},{"word":"elicit","pos":"verb","pronunciation":"ih-LISS-it","en_def":"To get (a response, information, etc.) from someone.","ko_def":"누군가로부터 (반응, 정보 등을) 끌어내다 또는 유도해 내다.","en_example":"The comedian's joke failed to elicit a single laugh from the audience.","ko_example":"그 코미디언의 농담은 관객들로부터 단 한 번의 웃음도 이끌어내지 못했다.","synonyms":"evoke, extract, obtain","antonyms":"suppress"},{"word":"emancipation","pos":"noun","pronunciation":"ih-man-suh-PAY-shun","en_def":"Emancipation is the act or process of being freed from restriction,","ko_def":"해방, 자유화","en_example":"The Emancipation Proclamation marked a turning point in U.S. history.","ko_example":"노예해방 선언은 미국 역사에서 전환점이었다.","synonyms":"liberation, freedom, release","antonyms":"enslavement, oppression, bondage"},{"word":"eminently","pos":"adverb","pronunciation":"EM-uh-nunt-lee","en_def":"Eminently means to a notable degree; used to emphasize a positive quality.","ko_def":"대단히, 탁월하게, 매우","en_example":"She was eminently qualified for the senior research position.","ko_example":"그녀는 수석 연구직에 매우 적합한 자격을 갖추고 있었다.","synonyms":"notably, remarkably, exceptionally","antonyms":"barely, scarcely, hardly"},{"word":"encapsulate","pos":"verb","pronunciation":"in-KAP-suh-layt","en_def":"To encapsulate is to express the essential features of something succinctly, or to enclose in a capsule.","ko_def":"핵심을 요약하거나 집약하다","en_example":"The documentary encapsulates the struggles of an entire generation in just ninety minutes.","ko_example":"그 다큐멘터리는 90분 만에 한 세대 전체의 고난을 압축해서 담아낸다.","synonyms":"summarize, condense, distill","antonyms":"expand, elaborate, amplify"},{"word":"endemic","pos":"adjective","pronunciation":"en-DEM-ik","en_def":"Endemic describes something regularly found among particular people or in a certain area, especially a disease.","ko_def":"특정 지역 고유의, 고착된","en_example":"Corruption had become endemic in the region's political institutions.","ko_example":"부패는 그 지역의 정치 기관에 만연해 있었다.","synonyms":"widespread, prevalent, pervasive","antonyms":"rare, isolated, exotic"},{"word":"enigmatic","pos":"adjective","pronunciation":"en-ig-MAT-ik","en_def":"Something or someone described as enigmatic is mysterious and difficult to understand.","ko_def":"어떤 사람이나 사물이 신비롭고 이해하기 어려워 수수께끼 같음을 나타냅니다.","en_example":"The Mona Lisa is famous for her enigmatic smile, which has puzzled art","ko_example":"모나리자는 수 세기 동안 예술 애호가들을 헷갈리게 만든, 그 수수께끼 같은 미소로 유명합니다.","synonyms":"mysterious(신비로운), cryptic(아리송한), puzzling(곤혹스러운)","antonyms":"obvious(명백한)"},{"word":"ephemeral","pos":"adjective","pronunciation":"ih-FEM-uh-rul","en_def":"Something described as ephemeral lasts only for a very short time.","ko_def":"아주 짧은 시간 동안만 지속되는 것, 즉 덧없거나 수명이 짧은 것을 의미합니다.","en_example":"The beauty of cherry blossoms lies in their ephemeral nature, blooming","ko_example":"벚꽃의 아름다움은 며칠 동안만 피었다가 지는 그 덧없는 본질에 있습니다.","synonyms":"fleeting, transient, short-lived","antonyms":"permanent"},{"word":"Erin go bragh","pos":"phrase","pronunciation":"air-un-guh-BRAW","en_def":"Erin go bragh is an Irish phrase that means \"Ireland forever.\"","ko_def":"\"아일랜드여 영원하라\"라는 뜻을 가진 아일랜드어 관용구입니다.","en_example":"The crowd erupted in cheers of \"Erin go bragh!\" as the St. Patrick's Day parade passed by.","ko_example":"성 패트릭의 날 퍼레이드가 지나가자 군중들은 \"아일랜드여 영원하라!\"라고 환호성을 질렀습니다.","synonyms":"Ireland forever, Long live Ireland, God save Ireland","antonyms":"Down with Ireland"},{"word":"espouse","pos":"verb","pronunciation":"ih-SPOWZ","en_def":"To espouse an ideology, belief, etc., is to take it up and support it as a cause.","ko_def":"(이념이나 신념 등을) 받아들이고 지지하다, 옹호하다.","en_example":"The candidate used the debate as an opportunity to espouse his plans for","ko_example":"그 후보자는 토론회를 자신의 경제 개혁안을 옹호하는 기회로 삼았다.","synonyms":"advocate, champion, adopt","antonyms":"reject"},{"word":"euphoria","pos":"noun","pronunciation":"yoo-ˈFOR-ee-ə","en_def":"Euphoria is an intense state of joy or excitement.","ko_def":"큰 기쁨, 희열","en_example":"After winning the game, the team was filled with euphoria.","ko_example":"경기에서 이긴 뒤 팀은 희열로 가득 찼다.","synonyms":"elation, ecstasy, bliss","antonyms":"despair, misery, depression"},{"word":"eureka","pos":"adjective","pronunciation":"yoo-REE-kuh","en_def":"Eureka is an exclamation used to celebrate a discovery, or an adjective describing a sudden triumphant moment of discovery.","ko_def":"갑작스러운 발견의 순간","en_example":"After weeks of failed experiments, she finally had her eureka moment in the lab.","ko_example":"수주간의 실패한 실험 끝에, 그녀는 마침내 실험실에서 깨달음의 순간을 맞이했다.","synonyms":"revelatory, inspired, groundbreaking","antonyms":"uninspired, obvious, mundane"},{"word":"exculpatory","pos":"adjective","pronunciation":"adjective","en_def":"Something described as exculpatory serves to prove that someone is not guilty of doing something wrong.","ko_def":"어떤 사람이 잘못한 일이 없다는 것을 증명하는, 무죄를 입증하는.","en_example":"The defense team hoped the newly discovered email would provide the exculpatory evidence needed to free their client.","ko_example":"변호인단은 새로 발견된 이메일이 의뢰인의 무죄를 입증하는 데 필요한 증거가 되기를 바랐습니다.","synonyms":"vindicating, exonerating, absolving","antonyms":"incriminating"},{"word":"exhilarate","pos":"verb","pronunciation":"ig-ZIL-uh-rayt","en_def":"To exhilarate is to make someone feel very happy, animated, or elated.","ko_def":"매우 기쁘고 신나게 하다","en_example":"The view from the mountaintop exhilarated the hikers after their long climb.","ko_example":"긴 등반 후 산 정상에서 바라본 경치는 등산객들을 활기차게 했다.","synonyms":"thrill, invigorate, elate","antonyms":"depress, bore, discourage"},{"word":"febrile","pos":"adjective","pronunciation":"FEB-ryle","en_def":"Febrile means having or showing the symptoms of a fever, or characterised by a great deal of nervous excitement.","ko_def":"열이 나는; 과열된, 열광적인","en_example":"There was a febrile atmosphere in the trading room as the stock prices began to crash.","ko_example":"주가가 폭락하기 시작하자 거래실에는 긴장된 분위기가 감돌았다.","synonyms":"feverish, frantic, agitated","antonyms":"calm, composed, tranquil"},{"word":"fidelity","pos":"noun","pronunciation":"fuh-DELL-uh-tee","en_def":"Fidelity means loyalty and devotion to someone or something, or accuracy","ko_def":"충실, 정확성","en_example":"Her fidelity to her values never wavered, even in hardship.","ko_example":"그녀는 어려움 속에서도 자신의 가치에 충실했다.","synonyms":"loyalty, faithfulness, devotion","antonyms":"infidelity, disloyalty, betrayal"},{"word":"fiduciary","pos":"adjective","pronunciation":"fuh-DOO-shee-air-ee","en_def":"Fiduciary is a formal word describing something relating to or involving trust, such as the trust between a customer and a professional.","ko_def":"고객과 전문가 사이의 관계처럼, 신뢰와 관련되거나 신뢰를 포함하는 상황을 묘사하는 격식 있는 단어입니다. (주로 '수탁자의', '신탁의'라는 의미로 쓰입니다.)","en_example":"Financial advisors have a fiduciary duty to act in the best interests of","ko_example":"재정 고문들은 고객의 최선의 이익을 위해 행동해야 할 수탁 의무가 있습니다.","synonyms":"trust-based (신뢰에 기반한), custodial (관리의), guardian","antonyms":"untrustworthy (신뢰할 수 없는)"},{"word":"fiscal","pos":"adjective","pronunciation":"FISS-kul","en_def":"Fiscal relates to government revenue, especially taxes, or to financial matters in general.","ko_def":"국가 재정이나 자금 관리와 관련된","en_example":"The government announced new fiscal policies aimed at reducing the national deficit.","ko_example":"정부는 국가 적자를 줄이기 위한 새로운 재정 정책을 발표했다.","synonyms":"financial, monetary, economic","antonyms":"non-financial, social, personal"},{"word":"foray","pos":"noun","pronunciation":"FOR-ay","en_def":"A foray is a sudden attack or incursion into enemy territory, or a first attempt at a new activity.","ko_def":"새로운 분야로의 첫 시도","en_example":"Her foray into the world of high fashion was both exciting and intimidating.","ko_example":"하이패션 세계로의 그녀의 첫 도전은 설레면서도 두려운 경험이었다.","synonyms":"excursion, venture, incursion","antonyms":"retreat, withdrawal, avoidance"},{"word":"fortitude","pos":"noun","pronunciation":"ˈfɔːr-tɪ-tuːd","en_def":"Fortitude means mental or emotional strength that allows someone to face","ko_def":"용기, 인내","en_example":"She showed remarkable fortitude during her long illness.","ko_example":"그녀는 긴 투병 기간에도 놀라운 인내심을 보였다.","synonyms":"courage, resilience, endurance","antonyms":"cowardice, weakness, timidity"},{"word":"fortuitous","pos":"adjective","pronunciation":"for-TOO-uh-tus","en_def":"Fortuitous describes something happening by chance, especially a lucky chance.","ko_def":"운 좋게 우연히 일어난","en_example":"It was entirely fortuitous that she happened to be at the right place at the right time.","ko_example":"그녀가 딱 맞는 시간에 딱 맞는 장소에 있었던 것은 전적으로 행운이었다.","synonyms":"lucky, accidental, chance","antonyms":"deliberate, planned, intentional"},{"word":"frenetic","pos":"adjective","pronunciation":"frih-NET-ik","en_def":"Frenetic describes activity that is fast and energetic in a rather wild and uncontrolled way.","ko_def":"열광, 활동, 혼란으로 가득 찬 상태","en_example":"The frenetic pace of city life was exhausting for someone raised in the countryside.","ko_example":"도시 생활의 정신없는 속도는 시골에서 자란 사람에게 버거웠다.","synonyms":"frenzied, hectic, frantic","antonyms":"calm, leisurely, relaxed"},{"word":"frolic","pos":"verb","pronunciation":"ˈfrä-lik","en_def":"Frolic means to move or play in a lively, carefree, or joyful way.","ko_def":"즐겁게 뛰놀다","en_example":"Children frolicked in the snow after the storm.","ko_example":"폭풍이 지난 뒤 아이들이 눈밭에서 뛰놀았다.","synonyms":"play, romp, cavort","antonyms":"mope, sulk, languish"},{"word":"frowsy","pos":"adjective","pronunciation":"FROW-zee","en_def":"Something described as frowsy has a messy or dirty appearance.","ko_def":"지저분하거나 불결한 외관, 혹은 단정치 못한 모습을 의미합니다.","en_example":"After sleeping in her clothes all night, she looked quite frowsy at the morning meeting.","ko_example":"밤새 옷을 입은 채로 잠을 잔 탓에, 그녀는 아침 회의에서 꽤 지저분해 보였다.","synonyms":"scruffy, unkempt, slovenly","antonyms":"neat"},{"word":"gargantuan","pos":"adjective","pronunciation":"gahr-GAN-chuh-wun","en_def":"Gargantuan describes something that is very large in size or amount; something gargantuan is, in other words, gigantic.","ko_def":"크기나 양이 매우 거대한 것을 묘사하며, 다시 말해 엄청나게 큰 것을 의미합니다.","en_example":"The cleanup crew faced a gargantuan task after the massive festival","ko_example":"대규모 축제가 끝난 후 청소팀은 엄청난 양의 업무에 직면했습니다.","synonyms":"gigantic, colossal, massive","antonyms":"tiny"},{"word":"garner","pos":"verb","pronunciation":"GAHR-ner","en_def":"To acquire by effort; earn, or to accumulate or collect.","ko_def":"(노력을 통해) 얻다, 모으다, 축적하다.","en_example":"The movie garnered critical acclaim for its unique storytelling and","ko_example":"그 영화는 독특한 스토리텔링과 시각 효과로 비평가들의 찬사를 받았습니다.","synonyms":"gather, collect, accumulate","antonyms":"scatter"},{"word":"gauche","pos":"adjective","pronunciation":"GOHSH","en_def":"Describes someone or something having or showing a lack of awareness about the proper way to behave.","ko_def":"서투르고 눈치 없는, 사회적으로 미숙한.","en_example":"His gauche comment about her age silenced the entire dinner party.","ko_example":"그녀의 나이에 대한 그의 눈치 없는 발언은 저녁 파티 전체를 침묵에 빠뜨렸다.","synonyms":"awkward, tactless, clumsy","antonyms":"sophisticated"},{"word":"Goldilocks","pos":"adjective","pronunciation":"GOHL-dee-lahks","en_def":"Goldilocks describes a situation or thing that is just right, neither too much nor too little, ideal.","ko_def":"딱 알맞은 최적의 균형","en_example":"Economists described it as a Goldilocks economy — not too hot, not too cold.","ko_example":"경제학자들은 그것을 골디락스 경제라고 표현했다 — 너무 뜨겁지도, 너무 차갑지도 않은.","synonyms":"ideal, perfect, just right","antonyms":"extreme, excessive, insufficient"},{"word":"grandiose","pos":"adjective","pronunciation":"gran-dee-OHSS","en_def":"Grandiose describes something impressive and imposing in appearance or style, especially pretentiously so.","ko_def":"거창하고 과장된(실속 없는)","en_example":"His grandiose plans for the company turned out to be completely unrealistic.","ko_example":"회사를 위한 그의 거창한 계획은 완전히 비현실적인 것으로 드러났다.","synonyms":"ambitious, imposing, pompous","antonyms":"modest, humble, understated"},{"word":"grift","pos":"verb","pronunciation":"GRIFT","en_def":"To grift is to use dishonest tricks to illegally take money or property.","ko_def":"부정한 속임수를 사용하여 불법적으로 돈이나 재산을 가로채다(사취하다).","en_example":"The fake charity used emotional photos to grift donations from","ko_example":"그 가짜 자선 단체는 동정심 많은 사람들에게서 기부금을 사취하기 위해 감성적인 사진들을 사용했다.","synonyms":"swindle, scam, defraud","antonyms":"donate"},{"word":"gumbo","pos":"noun","pronunciation":"GUM-boh","en_def":"Gumbo is a spicy stew from Louisiana typically containing meat or shellfish, okra, and various vegetables; also used to describe a mixture of diverse elements.","ko_def":"걸쭉한 수프 요리; 문화적 혼합물","en_example":"The city's culture is a gumbo of African, French, and Native American influences.","ko_example":"그 도시의 문화는 아프리카, 프랑스, 아메리카 원주민의 영향이 뒤섞인 혼합물이다.","synonyms":"mixture, medley, blend","antonyms":"uniformity, purity, homogeneity"},{"word":"hark back","pos":"verb","pronunciation":"HAHRK-BAK","en_def":"To hark back means to recall or evoke a past event, time, or thing.","ko_def":"과거의 주제로 되돌아가다, 기원을 상기시키다","en_example":"His musical style harks back to the jazz era of the 1940s.","ko_example":"그의 음악 스타일은 1940년대 재즈 시대를 상기시킨다.","synonyms":"recall, evoke, hark","antonyms":"look forward, anticipate, foresee"},{"word":"hector","pos":"verb","pronunciation":"HEK-ter","en_def":"To hector is to talk to someone in a bullying or intimidating way.","ko_def":"위협적으로 몰아붙이다","en_example":"The manager would constantly hector his staff in front of clients, damaging team morale.","ko_example":"그 관리자는 고객 앞에서 끊임없이 직원들을 윽박질러 팀 사기를 저하시켰다.","synonyms":"bully, intimidate, browbeat","antonyms":"encourage, support, praise"},{"word":"heyday","pos":"noun","pronunciation":"HAY-day","en_def":"Heyday refers to the period of one's greatest popularity, vigor, or prosperity.","ko_def":"개인이나 사물의 인기가 가장 높거나 활기, 번영이 최고조에 달했던 시기를 의미합니다.","en_example":"The 1990s were the heyday of pop music, with many legendary groups debuting during that time.","ko_example":"1990년대는 많은 전설적인 그룹들이 그 시기에 데뷔했던 팝 음악의 전성기였습니다.","synonyms":"prime, peak, zenith","antonyms":"nadir"},{"word":"hibernaculum","pos":"noun","pronunciation":"hye-ber-NAK-yuh-lum","en_def":"Refers to a shelter occupied during the winter by a dormant animal, such as an insect, snake, bat, or marmot.","ko_def":"곤충, 뱀, 박쥐, 마멋과 같은 동물이 겨울 동안 머무는 은신처(동면 장소)를 의미합니다.","en_example":"To temporize is to avoid making a decision or giving a definite answer in order to have more time.","ko_example":"박쥐 무리는 혹독한 겨울을 나기 위해 지하에 있는 그들의 동면 장소로 돌아왔습니다.","synonyms":"den, burrow, lair","antonyms":"summer habitat"},{"word":"hobgoblin","pos":"noun","pronunciation":"muh-NAJ-uh-ree","en_def":"A hobgoblin is a mischievous goblin that plays tricks in children's stories.","ko_def":"홉고블린은 어린이 이야기에서 장난을 치는 짓궂은 고블린입니다. (비유적으로는 두려움이나 걱정의 대상을 의미하기도 합니다.)","en_example":"For many, the fear of failure is a hobgoblin that prevents them from pursuing their dreams.","ko_example":"많은 사람들에게 실패에 대한 두려움은 꿈을 좇지 못하게 만드는 홉고블린 (두려움의 대상)입니다.","synonyms":"bugbear, bogeyman, specter","antonyms":"angel"},{"word":"hornswoggle","pos":"verb","pronunciation":"HORN-swah-gul","en_def":"To hornswoggle someone is to trick or deceive them.","ko_def":"누군가를 속이거나 기만하다.","en_example":"The salesman tried to hornswoggle me into buying a broken car, but I saw","ko_example":"그 영업사원은 나를 속여서 고장 난 차를 사게 하려 했지만, 나는 그의 거짓말을 간파했다.","synonyms":"bamboozle, deceive, hoodwink","antonyms":"enlighten"},{"word":"iconoclast","pos":"noun","pronunciation":"eye-KAH-nuh-klast","en_def":"anyone who criticizes or opposes beliefs and practices that are widely accepted.","ko_def":"널리 받아들여지는 신념이나 관행을 비판하거나 반대하는 사람.","en_example":"As an iconoclast in the art world, he painted in a style that broke all traditional rules.","ko_example":"미술계의 우상 파괴자로서, 그는 모든 전통적인 규칙을 깨는 스타일로 그림을 그렸습니다.","synonyms":"rebel, maverick, nonconformist","antonyms":"conformist"},{"word":"imbue","pos":"verb","pronunciation":"im-BYOO","en_def":"To imbue something is to inspire or permeate it with a feeling or quality.","ko_def":"성질을 불어넣다, 스며들게 하다","en_example":"The teacher tried to imbue her students with a love of literature from an early age.","ko_example":"그 교사는 어릴 때부터 학생들에게 문학에 대한 사랑을 불어넣으려 했다.","synonyms":"infuse, inspire, permeate","antonyms":"drain, deprive, empty"},{"word":"imprimatur","pos":"noun","pronunciation":"im-pruh-MAH-toor","en_def":"Imprimatur means formal approval or permission, especially from an","ko_def":"승인, 허가","en_example":"The festival had the university's imprimatur despite being","ko_example":"독립적으로 개최되었지만, 축제는 대학의 승인을 받았다.","synonyms":"approval, sanction, endorsement","antonyms":"veto, prohibition, rejection"},{"word":"innocuous","pos":"adjective","pronunciation":"ih-NAH-kyuh-wus","en_def":"Innocuous describes something not harmful or offensive; completely harmless.","ko_def":"해를 끼치지 않는, 무해한, 악의 없는","en_example":"What seemed like an innocuous comment sparked an unexpected controversy online.","ko_example":"무해해 보였던 발언이 온라인에서 예상치 못한 논란을 불러일으켰다.","synonyms":"harmless, benign, inoffensive","antonyms":"harmful, dangerous, offensive"},{"word":"inoculate","pos":"verb","pronunciation":"-NAHK","en_def":"To introduce immunologically active material into a person or animal especially in order to treat or prevent a disease.","ko_def":"질병을 치료하거나 예방하기 위해 사람이나 동물에게 면역 물질(백신 등)을 주입하다 (예방 접종하다).","en_example":"The government plans to inoculate the entire population against the new","ko_example":"정부는 연말까지 전 국민에게 새로운 바이러스에 대한 예방 접종을 실시할 계획이다.","synonyms":"vaccinate, immunize, inject","antonyms":"infect"},{"word":"jaunty","pos":"adjective","pronunciation":"JAWN-tee","en_def":"Something described as jaunty is lively in manner or appearance.","ko_def":"태도나 겉모습이 쾌활하고 의기양양한 것을 의미합니다.","en_example":"She walked into the office with a jaunty step, humming a happy tune.","ko_example":"그녀는 행복한 곡조를 흥얼거리며 경쾌한 발걸음으로 사무실에 들어왔다.","synonyms":"lively, cheerful, sprightly","antonyms":"depressed"},{"word":"jejune","pos":"adjective","pronunciation":"jih-JOON","en_def":"Jejune is a formal word that means \"uninteresting\" or \"boring,\" or describes things that are immature, childish, or simplistic.","ko_def":"흥미가 없거나 지루하며, 미성숙하고 유치하거나 너무 단순한 것을 의미하는 격식 있는 단어입니다.","en_example":"Nadir refers to the lowest or worst point of something.","ko_example":"어떤 것의 가장 낮거나 최악인 지점(최저점)을 의미합니다.","synonyms":"vapid, juvenile, insipid","antonyms":"profound"},{"word":"knackered","pos":"adjective","pronunciation":"NAK-erd","en_def":"Knackered is an informal British term meaning extremely tired, or worn out and broken.","ko_def":"몹시 지친, 녹초가 된","en_example":"After the twelve-hour shift, she was completely knackered and fell asleep on the sofa.","ko_example":"12시간 교대 근무 후 그녀는 완전히 지쳐서 소파에서 잠들었다.","synonyms":"exhausted, drained, spent","antonyms":"energized, refreshed, invigorated"},{"word":"laconic","pos":"adjective","pronunciation":"luh-KAH-nik","en_def":"Laconic describes using very few words to express something; brief and concise.","ko_def":"말수가 적고 간결한","en_example":"His laconic reply of 'fine' gave no indication of how he truly felt.","ko_example":"그의 간결한 '괜찮아'라는 대답은 그가 실제로 어떻게 느끼는지 전혀 알 수 없게 했다.","synonyms":"terse, concise, succinct","antonyms":"verbose, wordy, long-winded"},{"word":"leviathan","pos":"noun","pronunciation":"luh-VYE-uh-thun","en_def":"Leviathan is a word that refers broadly to something very large and powerful, or more narrowly to a large sea animal.","ko_def":"매우 거대하고 강력한 것(조직, 국가 등), 또는 거대한 바다 생물을 광범위하게 지칭합니다.","en_example":"The huge container ship was a steel leviathan that dwarfed every other","ko_example":"그 거대한 컨테이너선은 항구에 있는 다른 모든 배를 아주 작아 보이게 만드는 강철로 된 거인이었습니다.","synonyms":"behemoth, colossus, titan","antonyms":"dwarf"},{"word":"libertine","pos":"noun","pronunciation":"LIB-er-teen","en_def":"A libertine is a person who freely indulges in sensual pleasures without moral restraint.","ko_def":"도덕적으로 방종한 사람","en_example":"The memoir portrayed him as a libertine who lived entirely for his own pleasures.","ko_example":"그 회고록은 그를 오로지 자신의 쾌락만을 위해 살았던 방탕한 사람으로 묘사했다.","synonyms":"hedonist, debauchee, rake","antonyms":"puritan, ascetic, moralist"},{"word":"loll","pos":"verb","pronunciation":"LAHL","en_def":"To loll is to sit, lie, or hang in a relaxed, lazy way; to hang loosely.","ko_def":"축 늘어져 있다, 나른하게 행동하다","en_example":"The cat lolled in the sunshine, completely indifferent to everything around it.","ko_example":"고양이는 햇살 속에서 주위의 모든 것에 완전히 무관심한 채 느긋하게 늘어져 있었다.","synonyms":"lounge, sprawl, recline","antonyms":"stand, sit upright, bustle"},{"word":"lout","pos":"noun","pronunciation":"lout","en_def":"Lout refers to a crude, awkward, or disrespectful person, typically a","ko_def":"버릇없고 무례한 사람","en_example":"He acted like a lout at dinner, interrupting everyone.","ko_example":"그는 저녁 식사 자리에서 모두의 말을 끊으며 무례했다.","synonyms":"oaf, boor, brute","antonyms":"gentleman, refined person"},{"word":"marginalia","pos":"noun","pronunciation":"mahr-juh-NAY-lee-uh","en_def":"Marginalia are notes or illustrations written in the margins of a book or manuscript.","ko_def":"페이지 여백에 적은 메모나 낙서","en_example":"The scholar found valuable marginalia in the ancient text that shed light on its meaning.","ko_example":"학자는 고대 문헌에서 그 의미를 밝혀주는 귀중한 여백 주석을 발견했다.","synonyms":"annotations, notes, commentary","antonyms":"main text, body, content"},{"word":"mea culpa","pos":"noun","pronunciation":"may-uh-KOOL-puh","en_def":"Mea culpa is an acknowledgment of one's fault or error; a formal apology.","ko_def":"자신의 잘못 인정","en_example":"The CEO issued a public mea culpa for the company's handling of the data breach.","ko_example":"CEO는 회사의 데이터 유출 처리에 대해 공개적으로 사과했다.","synonyms":"apology, confession, admission","antonyms":"denial, deflection, accusation"},{"word":"meme","pos":"noun","pronunciation":"MEEM","en_def":"A meme is an element of culture or behavior that spreads from person to person; today commonly refers to a humorous image or video spread online.","ko_def":"인터넷 밈, 문화 전파 단위","en_example":"The politician's awkward gesture became a popular meme overnight.","ko_example":"그 정치인의 어색한 제스처는 하룻밤 사이에 인기 있는 밈이 되었다.","synonyms":"cultural unit, viral content, trend","antonyms":"original, niche content"},{"word":"menagerie","pos":"noun","pronunciation":"muh-NAJ-uh-ree","en_def":"A menagerie is a collection of wild animals kept in captivity for exhibition, or a diverse and varied group.","ko_def":"대중에게 보여주기 위해 사육되는 동물들의 집합 또는 장소","en_example":"The old antique shop was a fascinating menagerie of forgotten treasures and peculiar items.","ko_example":"그 오래된 골동품 가게는 잊힌 보물들과 기이한 물건들의 매력적인 집합소였다.","synonyms":"collection, zoo, assortment","antonyms":"uniformity, singularity"},{"word":"metonymy","pos":"noun","pronunciation":"muh-TAH-nuh-mee","en_def":"Metonymy refers to a figure of speech in which a word that is associated with something is used to refer to the thing itself, as when crown is used to mean \"king\" or \"queen.\"","ko_def":"어떤 사물과 관련된 단어를 사용하여 그 사물 자체를 가리키는 수사법. 예를 들어 '왕관(crown)'으로 '왕'이나 '여왕'을 의미하는 경우를 말합니다.","en_example":"In journalism, using \"the Pentagon\" to refer to the U.S. Department of Defense is a common form of metonymy.","ko_example":"저널리즘에서 \"펜타곤\"을 미국 국방부를 지칭하는 데 사용하는 것은 환유의 흔한 형태입니다.","synonyms":"figure of speech (비유), trope (수사적 표현), synecdoche","antonyms":"literalism (문자 그대로의 해석)"},{"word":"multitudinous","pos":"adjective","pronunciation":"mul","en_def":"Existing in a great multitude---that is, \"very many\"---or consisting of innumerable elements or aspects.","ko_def":"대단히 많은 수로 존재하거나, 셀 수 없이 많은 요소나 측면으로 구성된 상태를 의미합니다.","en_example":"The problems facing the project were multitudinous, ranging from budget","ko_example":"그 프로젝트가 직면한 문제들은 예산 삭감부터 기술적 결함까지 수없이 많았습니다.","synonyms":"numerous, abundant, myriad","antonyms":"few"},{"word":"nadir","pos":"noun","pronunciation":"NAY-deer","en_def":"Nadir refers to the lowest or worst point of something.","ko_def":"최저점, 인생의 바닥","en_example":"After the scandal, the politician's popularity reached its nadir.","ko_example":"스캔들이 터진 후, 그 정치인의 인기는 최저점에 도달했다.","synonyms":"lowest point, bottom, rock bottom","antonyms":"zenith, peak, apex"},{"word":"nefarious","pos":"adjective","pronunciation":"nih-FAIR-ee-us","en_def":"Nefarious describes someone or something that is wicked or criminal in nature.","ko_def":"사악한, 비도덕적인, 범죄의","en_example":"The detective uncovered the nefarious plot to defraud thousands of investors.","ko_example":"형사는 수천 명의 투자자를 사기 치려는 사악한 음모를 밝혀냈다.","synonyms":"wicked, villainous, heinous","antonyms":"virtuous, righteous, noble"},{"word":"nettle","pos":"verb","pronunciation":"NET-ul","en_def":"To nettle someone is to irritate or annoy them; as a noun, a plant with stinging leaves.","ko_def":"짜증 나게 하다, 성나게 하다","en_example":"His dismissive tone nettled her far more than the criticism itself.","ko_example":"그의 무시하는 태도는 비판 자체보다 그녀를 훨씬 더 짜증나게 했다.","synonyms":"irritate, annoy, provoke","antonyms":"soothe, calm, appease"},{"word":"noel","pos":"noun","pronunciation":"noh-EL","en_def":"Noel is another word for Christmas, often used in carols and songs.","ko_def":"크리스마스 또는 크리스마스 캐럴","en_example":"The choir sang the first noel as snow began to fall outside the church.","ko_example":"성가대가 첫 번째 크리스마스 캐롤을 부르는 동안 교회 밖에 눈이 내리기 시작했다.","synonyms":"Christmas, Yule, carol","antonyms":""},{"word":"notorious","pos":"adjective","pronunciation":"noh-TOR-ee-us","en_def":"Notorious describes people and things that are well-known or famous, especially for something bad or unfavorable.","ko_def":"주로 나쁘거나 좋지 않은 일로 잘 알려져 있거나 유명한 사람 또는 사물을 묘사합니다. (악명 높은)","en_example":"The highway is notorious for its frequent accidents and heavy traffic","ko_example":"그 고속도로는 빈번한 사고와 심한 교통 체증으로 악명이 높습니다.","synonyms":"infamous, disreputable, scandalous","antonyms":"respectable"},{"word":"oaf","pos":"noun","pronunciation":"OHF","en_def":"Oaf is used to refer to someone as big, clumsy, and slow-witted.","ko_def":"덩치가 크고 행동이 굼뜨며 우둔한 사람(멍청이, 미련퉁이)을 가리킵니다.","en_example":"Don't be such a clumsy oaf and watch where you're stepping!","ko_example":"그렇게 덤벙대는 멍청이처럼 굴지 말고 발밑 좀 보고 다녀!","synonyms":"lout, clod, bumpkin","antonyms":"genius"},{"word":"onomatopoeia","pos":"noun","pronunciation":"ah-nuh-mah-tuh-PEE-uh","en_def":"Onomatopoeia is the formation of a word from a sound associated with its meaning, such as 'buzz' or 'crash'.","ko_def":"의성어","en_example":"The poem was filled with onomatopoeia, making the sounds of nature come alive on the page.","ko_example":"그 시는 의성어로 가득 차 있어, 자연의 소리가 페이지 위에서 생생하게 살아났다.","synonyms":"sound symbolism, phonetic imitation","antonyms":"arbitrary signifier"},{"word":"ostracize","pos":"verb","pronunciation":"AH-struh-syze","en_def":"To ostracize someone is to exclude them from a group by the agreement of the group's members.","ko_def":"(집단 구성원들의 합의에 따라) 누군가를 집단에서 배척하거나 외면하다.","en_example":"After the scandal, the politician was ostracized by his own party.","ko_example":"그 스캔들 이후, 그 정치인은 자신의 정당으로부터 외면당했다.","synonyms":"exclude, shun, banish","antonyms":"welcome"},{"word":"paean","pos":"noun","pronunciation":"PEE-un","en_def":"A paean is a song of praise or joy, or a written or spoken expression of enthusiastic praise.","ko_def":"찬가, 찬양의 글","en_example":"Her acceptance speech was a heartfelt paean to her mentors and family.","ko_example":"그녀의 수상 소감은 스승과 가족에 대한 진심 어린 찬사였다.","synonyms":"hymn, tribute, encomium","antonyms":"criticism, denunciation, condemnation"},{"word":"paradox","pos":"noun","pronunciation":"PAIR-uh-dahks","en_def":"A paradox is a statement or situation that seems self-contradictory or absurd but may in fact be true.","ko_def":"역설적 상황, 모순되어 보이나 사실인 것","en_example":"It is a paradox that the more choices people have, the less satisfied they often feel.","ko_example":"사람들에게 선택지가 많을수록 오히려 덜 만족한다는 것은 하나의 역설이다.","synonyms":"contradiction, anomaly, enigma","antonyms":"truism, consistency, clarity"},{"word":"perdition","pos":"noun","pronunciation":"per-DISH-un","en_def":"Perdition refers to a state of eternal punishment and damnation in an afterlife; utter ruin.","ko_def":"지옥, 또는 사후에 받는 영원한 벌(파멸)","en_example":"The preacher warned his congregation that greed would lead them to perdition.","ko_example":"목사는 신도들에게 탐욕이 영원한 멸망으로 이끌 것이라고 경고했다.","synonyms":"damnation, ruin, destruction","antonyms":"salvation, redemption, grace"},{"word":"peremptory","pos":"adjective","pronunciation":"puh-REMP-tuh-ree","en_def":"Describes an order, command, etc., that requires immediate compliance with no opportunity to show why one should not comply.","ko_def":"반론의 여지 없이 즉각적인 복종을 요구하는, 위압적인, 독단적인","en_example":"With a peremptory wave of his hand, the director dismissed all further questions from the reporters.","ko_example":"감독은 독단적인 손짓으로 기자들의 모든 추가 질문을 일축했다.","synonyms":"imperious, autocratic, high-handed","antonyms":"lenient"},{"word":"preeminent","pos":"adjective","pronunciation":"pree-EM-uh-nunt","en_def":"A formal word used to describe someone or something more important, skillful, or successful than their counterparts or peers.","ko_def":"동료나 경쟁자들보다 더 중요하거나, 능숙하거나, 성공적인 사람 또는 사물을 묘사하는 단어입니다. (탁월한, 발군의, 독보적인)","en_example":"She is widely recognized as the preeminent expert on climate change","ko_example":"그녀는 그 지역에서 기후 변화 정책에 관한 독보적인 전문가로 널리 인정받고 있습니다.","synonyms":"outstanding (뛰어난), supreme (최고의), distinguished (저명한)","antonyms":"obscure (무명의, 눈에 띄지 않는)"},{"word":"prerogative","pos":"noun","pronunciation":"prih-RAH-guh-tiv","en_def":"A prerogative is an exclusive right or privilege belonging to a particular person or group.","ko_def":"특권, 재량권","en_example":"Deciding the final budget is the CEO's prerogative alone.","ko_example":"최종 예산을 결정하는 것은 CEO만의 고유 권한이다.","synonyms":"right, privilege, entitlement","antonyms":"obligation, duty, restriction"},{"word":"prescience","pos":"noun","pronunciation":"PRESH","en_def":"Prescience is a formal word used to refer to the ability to see or anticipate what will or might happen in the future.","ko_def":"미래에 일어날 일을 미리 내다보거나 예상하는 능력 (예지력, 선견지명)","en_example":"The investor's prescience regarding the market crash allowed her to","ko_example":"시장 붕괴에 대한 그 투자자의 선견지명 덕분에 그녀는 가격이 폭락하기 전에 주식을 팔 수 있었다.","synonyms":"foresight, foreknowledge, insight","antonyms":"hindsight (뒤늦은 깨달음)"},{"word":"pseudonym","pos":"noun","pronunciation":"SOO-duh-nim","en_def":"A pseudonym is a name that someone (such as a writer) uses instead of their real name.","ko_def":"(작가 등이) 본명 대신 사용하는 이름, 즉 필명이나 가명을 의미합니다.","en_example":"To protect her privacy, the famous blogger wrote under a pseudonym, known to her readers only as \"Luna\".","ko_example":"그 유명 블로거는 사생활을 보호하기 위해 필명으로 글을 썼고, 독자들에게는 '루나'로만 알려져 있었습니다.","synonyms":"pen name, alias, sobriquet / 반의어: real name","antonyms":"real name"},{"word":"putative","pos":"adjective","pronunciation":"PYOO-tuh-tiv","en_def":"Putative is a formal word used to describe something that is generally believed, supposed, or assumed to be something specified.","ko_def":"일반적으로 그렇다고 믿어지거나, 추정되거나, 가정되는 상태를 나타내는 격식 있는 단어입니다.","en_example":"The putative cause of the technical glitch was a minor error in the","ko_example":"기술적 결함의 추정되는 원인은 소프트웨어 코드의 작은 오류였습니다.)","synonyms":"presumed, alleged, supposed / 반의어: confirmed","antonyms":"confirmed"},{"word":"quiddity","pos":"noun","pronunciation":"KWID-uh-tee","en_def":"Quiddity refers to the essence of a thing---that is, whatever makes something the type of thing that it is.","ko_def":"사물의 본질, 즉 어떤 것을 바로 그 사물이게끔 만드는 핵심적인 요소를 의미합니다.","en_example":"The philosopher spent his entire life trying to define the quiddity of","ko_example":"그 철학자는 인간 존재의 본질을 규명하는 데 평생을 바쳤습니다.","synonyms":"essence, quintessence, substance","antonyms":"exterior"},{"word":"radial","pos":"adjective","pronunciation":"-dee","en_def":"Radial describes things that are arranged or have parts arranged in straight lines coming out from the center of a circle.","ko_def":"원의 중심에서 뻗어 나오는 직선 형태로 배열되거나 그런 부분을 가진 것을 묘사합니다.","en_example":"The spider web had a beautiful radial design, with threads extending from the center.","ko_example":"그 거미줄은 중앙에서부터 실이 뻗어 나가는 아름다운 방사형 디자인을 하고 있었습니다.","synonyms":"radiating, star-shaped, circular","antonyms":"tangential"},{"word":"rapscallion","pos":"noun","pronunciation":"rap-SKAL-yun","en_def":"A rapscallion is a mischievous person, especially a child; a rascal.","ko_def":"장난기 많은 악동","en_example":"The little rapscallion had hidden his sister's toys just to see her reaction.","ko_example":"그 장난꾸러기 꼬마는 언니의 반응을 보려고 언니 장난감을 숨겨 놓았다.","synonyms":"rascal, scoundrel, imp","antonyms":"angel, paragon, model citizen"},{"word":"rash","pos":"adjective","pronunciation":"RASH","en_def":"Rash describes something done or made quickly and without thought about what will happen as a result.","ko_def":"결과에 대해 깊이 생각하지 않고 성급하게 혹은 성급하게 내린 결정이나 행동을 의미합니다.","en_example":"It was a rash decision to invest all of his savings in the volatile","ko_example":"변동성이 큰 주식 시장에 모든 저축액을 투자한 것은 성급한 결정이었다.","synonyms":"reckless, impulsive, hasty / 반의어: cautious","antonyms":"cautious"},{"word":"reciprocate","pos":"verb","pronunciation":"rih-SIP-ruh-kayt","en_def":"To reciprocate is to do something for or to someone who has done something similar for or to you.","ko_def":"자신에게 비슷한 일을 해준 상대방에게 보답하거나 똑같이 행동하는 것을 의미합니다. (또한 상대방이 자신에게 가진 감정과 똑같은 감정을 갖는다는 뜻으로도 쓰입니다.)","en_example":"After receiving so much help from her neighbors during the storm, she looked for a way to reciprocate their kindness.","ko_example":"폭풍이 칠 때 이웃들에게 많은 도움을 받은 후, 그녀는 그들의 친절에 보답할 방법을 찾았다.","synonyms":"repay (보답하다), return (돌려주다), requite (반응하다/보복하다)","antonyms":"deny (거절하다/부인하다)"},{"word":"resplendent","pos":"adjective","pronunciation":"rih-SPLEN-dunt","en_def":"A literary word used to describe someone or something as very bright and attractive.","ko_def":"사람이나 사물이 매우 밝고 매력적인 모습을 묘사하는 문어체 단어 (눈부시게 빛나는, 찬란한)","en_example":"The palace garden was resplendent with colorful flowers blooming in the","ko_example":"궁전 정원은 봄 햇살 아래 피어난 형형색색의 꽃들로 눈부시게 빛나고 있었다.","synonyms":"radiant, dazzling, magnificent","antonyms":"dull"},{"word":"retrospective","pos":"adjective","pronunciation":"reh-truh-SPEK-tiv","en_def":"Retrospective means looking back on or dealing with past events or situations; as a noun, an exhibition of an artist's past work.","ko_def":"과거를 돌이켜보는, 회고적인","en_example":"The museum held a retrospective of his paintings spanning four decades.","ko_example":"박물관은 40년에 걸친 그의 회화 작품 회고전을 개최했다.","synonyms":"backward-looking, reflective, historical","antonyms":"prospective, forward-looking"},{"word":"salubrious","pos":"adjective","pronunciation":"sə-LOO-bree-əs","en_def":"Salubrious describes something favorable to health or well-being.","ko_def":"건강에 좋은","en_example":"The resort is famous for its salubrious mountain air.","ko_example":"그 휴양지는 건강에 좋은 산 공기로 유명하다.","synonyms":"healthy, wholesome, refreshing","antonyms":"harmful, toxic, unhealthy"},{"word":"sartorial","pos":"adjective","pronunciation":"sahr-TOR-ee-ul","en_def":"Sartorial relates to tailoring, clothes, or style of dress.","ko_def":"의복과 관련된","en_example":"His sartorial elegance set him apart in every room he entered.","ko_example":"그의 세련된 옷차림은 그가 들어서는 모든 방에서 그를 돋보이게 했다.","synonyms":"sewing-related, stylish, fashionable","antonyms":"slovenly, unkempt, unfashionable"},{"word":"schmooze","pos":"verb","pronunciation":"SHMOOZ","en_def":"To schmooze is to warmly chat with someone often in order to gain favor, business, or connections.","ko_def":"호의를 얻거나 사업상 이익, 인맥을 쌓기 위해 누군가와 다정하게 수다를 떨다(비위를 맞추다).","en_example":"At the charity gala, he spent the entire evening trying to schmooze with","ko_example":"자선 갈라 행사에서 그는 자신의 새 프로젝트 자금을 지원받기 위해 저녁 내내 부유한 기부자들과 사교적으로 대화하며 비위를 맞추는 데 시간을 보냈다.","synonyms":"hobnob, network, chat up","antonyms":"ignore"},{"word":"scrutinize","pos":"verb","pronunciation":"SKROO-tuh-nyze","en_def":"To scrutinize is to examine or inspect closely and thoroughly.","ko_def":"면밀히 조사하다","en_example":"The auditors scrutinized every transaction in the company's financial records.","ko_example":"감사원들은 회사의 재무 기록에 있는 모든 거래를 면밀히 검토했다.","synonyms":"examine, inspect, analyze","antonyms":"overlook, ignore, neglect"},{"word":"senescence","pos":"noun","pronunciation":"sih-NESS-unss","en_def":"Senescence is the condition or process of deterioration with age, or the aging of cells.","ko_def":"노화, 늙어가는 과정","en_example":"Researchers are studying cellular senescence in the hope of slowing the aging process.","ko_example":"연구자들은 노화 과정을 늦추기 위한 희망으로 세포 노화를 연구하고 있다.","synonyms":"aging, deterioration, decline","antonyms":"youth, vitality, rejuvenation"},{"word":"sensibility","pos":"noun","pronunciation":"sen-suh-BIL-uh-tee","en_def":"Refers to someone's personal or cultural approach to what they encounter, or the ability to feel and understand emotions.","ko_def":"어떤 대상에 대해 개인이 또는 문화적으로 접근하는 방식, 혹은 감정을 느끼고 이해하는 능력(감수성)을 의미합니다.","en_example":"The designer's modern sensibility transformed the old building into a","ko_example":"그 디자이너의 현대적인 감수성은 낡은 건물을 활기찬 예술 공간으로 탈바꿈시켰다.","synonyms":"sensitivity, perceptiveness, awareness","antonyms":"insensitivity"},{"word":"serendipity","pos":"noun","pronunciation":"sair-un-DIP-uh-tee","en_def":"Serendipity refers to luck that takes the form of finding valuable or pleasant things that are not looked for, or to an instance of such luck.","ko_def":"찾으려 하지 않았던 가치 있거나 즐거운 것들을 우연히 발견하는 행운, 또는 그러한 행운의 사례.","en_example":"The discovery of penicillin was a classic case of scientific serendipity.","ko_example":"페니실린의 발견은 과학적 세렌디피티의 전형적인 사례였습니다.","synonyms":"fluke, happenstance, chance","antonyms":"misfortune"},{"word":"short shrift","pos":"noun","pronunciation":"SHORT-SHRIFT","en_def":"Short shrift means \"little or no attention or thought\" or \"quick work.\"","ko_def":"거의 관심이나 생각을 주지 않음(무시), 또는 어떤 일을 빠르게 해치워 버리는 것.","en_example":"The committee gave short shrift to the proposal, rejecting it after only","ko_example":"위원회는 그 제안에 거의 관심을 두지 않았고, 단 5분간의 논의 끝에 거절해 버렸다.","synonyms":"dismissal, disregard, snub","antonyms":"careful attention"},{"word":"spiel","pos":"noun","pronunciation":"SPEEL","en_def":"A spiel is a long or fast speech intended to persuade someone of something, often rehearsed.","ko_def":"설득을 위한 능숙한 말발","en_example":"The salesman launched into his practiced spiel the moment the door opened.","ko_example":"문이 열리자마자 영업사원은 능숙하게 준비된 설득 연설을 시작했다.","synonyms":"pitch, patter, monologue","antonyms":"silence, brevity, candor"},{"word":"spontaneous","pos":"adjective","pronunciation":"spahn-TAY-nee-us","en_def":"Spontaneous describes actions or speech that happen naturally and","ko_def":"즉흥적·자연스러운","en_example":"The kitten captured our hearts, and we made the spontaneous decision","ko_example":"새끼 고양이에 반해 즉흥적으로 입양을 결정했다. 메리엄-웹스터 사전","synonyms":"impulsive, instinctive, unplanned","antonyms":"deliberate, premeditated, planned"},{"word":"sustain","pos":"verb","pronunciation":"suh-STAYN","en_def":"To sustain someone or something is to provide what is needed for that person or thing to exist or continue.","ko_def":"어떤 사람이나 사물이 존재하거나 계속될 수 있도록 필요한 것을 제공하여 지탱하다.","en_example":"It's difficult to sustain economic growth during a global recession.","ko_example":"세계적인 불경기 동안 경제 성장을 지속하기는 어렵습니다.","synonyms":"maintain, support, uphold","antonyms":"abandon"},{"word":"syllogism","pos":"noun","pronunciation":"SIL-uh-jiz-um","en_def":"A syllogism is a form of logical reasoning in which a conclusion is drawn from two given premises.","ko_def":"삼단논법","en_example":"His argument was a classic syllogism: all humans are mortal, he is human, therefore he is mortal.","ko_example":"그의 논증은 전형적인 삼단논법이었다: 모든 인간은 죽는다, 그는 인간이다, 따라서 그는 죽는다.","synonyms":"deduction, reasoning, argument","antonyms":"fallacy, illogic, incoherence"},{"word":"tabula rasa","pos":"noun","pronunciation":"TAB-yuh-luh-RAH-zuh","en_def":"Tabula rasa refers to a person without prior knowledge or preconceptions; a blank slate.","ko_def":"백지 상태","en_example":"Philosophers debate whether the mind at birth is truly a tabula rasa.","ko_example":"철학자들은 태어날 때의 마음이 정말로 백지 상태인지 논쟁한다.","synonyms":"blank slate, clean sheet, fresh start","antonyms":"preconception, bias, fixed mind"},{"word":"temerity","pos":"noun","pronunciation":"tuh-MAIR-uh-tee","en_def":"Temerity is the quality of being confident and unafraid of danger or punishment, especially in a way that seems rude or foolish.","ko_def":"특히 무례하거나 어리석어 보일 정도로 위험이나 처벌을 두려워하지 않는 자신감 있는 특성.","en_example":"The rookie lawyer had the temerity to challenge the judge's ruling in front of the entire court.","ko_example":"그 신입 변호사는 법정 전체 앞에서 판사의 판결에 이의를 제기하는 무모함을 보였다.","synonyms":"audacity, recklessness, nerve","antonyms":"timidity"},{"word":"temporize","pos":"verb","pronunciation":"TEM-puh-ryze","en_def":"To temporize is to avoid making a decision or committing to a position in order to gain time.","ko_def":"시간을 벌기 위해 결정을 미루거나 확답을 피하다","en_example":"Rather than addressing the problem directly, the politician chose to temporize with vague statements.","ko_example":"문제를 직접 해결하는 대신, 그 정치인은 모호한 발언으로 시간을 끌기로 했다.","synonyms":"stall, delay, equivocate","antonyms":"decide, commit, act"},{"word":"titanic","pos":"adjective","pronunciation":"tye-TAN-ik","en_def":"Titanic describes something of exceptional strength, size, or power.","ko_def":"매우 거대한, 위력이 엄청난","en_example":"The merger required a titanic effort from both legal and financial teams.","ko_example":"그 합병에는 법무팀과 재무팀 모두의 엄청난 노력이 필요했다.","synonyms":"colossal, enormous, mighty","antonyms":"tiny, trivial, insignificant"},{"word":"truculent","pos":"adjective","pronunciation":"TRUCK-yuh-lunt","en_def":"Describes a person who is easily annoyed and eager to argue or fight.","ko_def":"쉽게 짜증을 내며 싸우거나 언쟁하려 드는, 공격적인, 호전적인","en_example":"The toddler became truculent whenever he didn't get the toy he wanted.","ko_example":"그 유아는 원하는 장난감을 갖지 못할 때마다 공격적으로 변했습니다.","synonyms":"aggressive, belligerent, confrontational","antonyms":"amiable"},{"word":"umbrage","pos":"noun","pronunciation":"UM-brij","en_def":"Umbrage refers to a feeling of being offended by what someone has said or done.","ko_def":"누군가의 말이나 행동으로 인해 느끼는 불쾌감이나 노여움을 의미합니다.","en_example":"He took umbrage at the suggestion that his success was merely due to","ko_example":"그는 자신의 성공이 단지 운 때문이었다는 암시에 불쾌감을 느꼈습니다.","synonyms":"offense, resentment, annoyance","antonyms":"pleasure"},{"word":"umpteen","pos":"adjective","pronunciation":"UMP-teen","en_def":"Umpteen means indefinitely many; a large but unspecified number.","ko_def":"셀 수 없이 많은","en_example":"I've told you umpteen times to back up your files before making changes.","ko_example":"변경하기 전에 파일을 백업하라고 수없이 말했잖아.","synonyms":"countless, numerous, many","antonyms":"few, scarce, none"},{"word":"unabashed","pos":"adjective","pronunciation":"un-uh-BASHT","en_def":"Someone who is unabashed is not embarrassed or ashamed about openly expressing strong feelings or opinions.","ko_def":"부끄러워하거나 창피해하지 않고 강한 감정이나 의견을 터놓고 표현하는.","en_example":"She had an unabashed love for cheesy pop music, singing along loudly in her car with the windows down.","ko_example":"그녀는 유치한 팝 음악에 대해 부끄럼 없는 애정을 가지고 있었고, 차창을 내린 채 큰 소리로 노래를 따라 불렀습니다.","synonyms":"shameless, brazen, unapologetic","antonyms":"abashed"},{"word":"undulate","pos":"verb","pronunciation":"UN-juh-layt","en_def":"To undulate is to move with a smooth, wave-like motion, or to have a wavy form.","ko_def":"파도처럼 움직이거나 물결 모양을 형성함","en_example":"The golden wheat fields undulated gently in the afternoon breeze.","ko_example":"황금빛 밀밭이 오후의 산들바람에 물결치듯 부드럽게 흔들렸다.","synonyms":"ripple, wave, oscillate","antonyms":"flatten, still, stabilize"},{"word":"vamoose","pos":"verb","pronunciation":"vuh-MOOSS","en_def":"Vamoose is an informal word that means \"to depart quickly.\"","ko_def":"(비격식) 서둘러 떠나다, 재빨리 사라지다.","en_example":"When the kids heard their mom's car pull into the driveway, they knew it was time to vamoose from the cookie jar.","ko_example":"아이들은 엄마의 차가 진입로로 들어서는 소리를 듣자, 쿠키 단지에서 재빨리 사라져야 할 시간이라는 것을 알았습니다.","synonyms":"flee, scram, skedaddle","antonyms":"stay"},{"word":"vaunted","pos":"adjective","pronunciation":"VAWN-tud","en_def":"Vaunted describes something that is highly praised or boasted about, sometimes more than it deserves.","ko_def":"과시되는, 널리 칭송되는","en_example":"The team's vaunted defense completely collapsed in the championship game.","ko_example":"그 팀의 자랑스러운 수비진은 챔피언십 경기에서 완전히 무너졌다.","synonyms":"acclaimed, celebrated, boasted","antonyms":"unsung, overlooked, modest"},{"word":"vendetta","pos":"noun","pronunciation":"ven-DET-uh","en_def":"Vendetta refers to an active and mutual hatred between two families or groups, also known as a blood feud.","ko_def":"두 가문이나 집단 사이의 적극적이고 상호적인 증오, 또는 '피의 복수'라고도 불리는 불화를 의미합니다.","en_example":"After the merger failed, the CEO waged a personal vendetta against his","ko_example":"합병이 실패한 후, CEO는 경쟁사의 유능한 직원들을 빼내려 시도하며 개인적인 복수극을 벌였습니다.","synonyms":"feud, grudge, vengeance","antonyms":"forgiveness"},{"word":"veracity","pos":"noun","pronunciation":"vuh-RASS-uh-tee","en_def":"A formal word that can refer to truth or accuracy, or to the quality of being truthful or honest.","ko_def":"진실이나 정확성, 또는 진실하거나 정직한 성질을 의미하는 격식 있는 단어입니다.","en_example":"The lawyer questioned the veracity of the witness's statement during","ko_example":"변호사는 반대 심문 중에 증인 진술의 진실성에 의문을 제기했다.","synonyms":"truthfulness, accuracy, credibility","antonyms":"dishonesty"},{"word":"vertiginous","pos":"adjective","pronunciation":"ver-TIJ-uh-nus","en_def":"Vertiginous describes something extremely high or steep, causing a feeling of dizziness.","ko_def":"아찔한, 현기증 나는","en_example":"She gripped the railing tightly on the vertiginous bridge overlooking the canyon.","ko_example":"그녀는 협곡을 내려다보는 아찔하게 높은 다리에서 난간을 꽉 붙잡았다.","synonyms":"dizzying, dizzy, staggering","antonyms":"stable, grounded, level"},{"word":"waggish","pos":"adjective","pronunciation":"WAG-ish","en_def":"Waggish describes someone who is silly and playful, and especially someone who displays a mischievous sense of humor.","ko_def":"익살스럽고 장난기가 많으며, 특히 짓궂은 유머 감각을 보여주는 사람이나 행동을 묘사합니다.","en_example":"The teacher couldn't help but smile at the student's waggish excuse","ko_example":"선생님은 지각에 대한 학생의 익살맞은 변명에 웃음을 참을 수 없었습니다.","synonyms":"playful, mischievous, jocular","antonyms":"solemn"},{"word":"writhe","pos":"verb","pronunciation":"RYTHE","en_def":"To writhe is to twist one's body from side to side.","ko_def":"(주로 고통으로) 몸을 이리저리 비틀다, 몸부림치다.","en_example":"The snake began to writhe after being caught in the net.","ko_example":"뱀은 그물에 걸리자 몸부림치기 시작했다.","synonyms":"squirm, thrash, flail","antonyms":"still"},{"word":"yen","pos":"noun","pronunciation":"YEN","en_def":"A yen is a longing or yearning for something.","ko_def":"강렬한 욕망, 갈망","en_example":"After years abroad, he had a deep yen to return to his hometown.","ko_example":"수년간의 해외 생활 후, 그는 고향으로 돌아가고 싶은 간절한 그리움을 느꼈다.","synonyms":"longing, craving, desire","antonyms":"aversion, disinterest, indifference"},{"word":"zany","pos":"adjective","pronunciation":"ZAY-nee","en_def":"Zany describes something amusingly unconventional and idiosyncratic in an endearing way.","ko_def":"매우 엉뚱하고 우스꽝스러운","en_example":"Her zany sense of humor made even the most tedious meetings bearable.","ko_example":"그녀의 엉뚱한 유머 감각은 가장 지루한 회의도 견딜 만하게 만들었다.","synonyms":"eccentric, wacky, quirky","antonyms":"serious, conventional, sober"}];
+
+let deck = [...Array(WORDS.length).keys()];
+let currentIdx = 0;
+let isFlipped = false;
+let showKo = true;
+let knownSet = new Set(JSON.parse(localStorage.getItem('acfc_known') || '[]'));
+let unknownSet = new Set(JSON.parse(localStorage.getItem('acfc_unknown') || '[]'));
+let filterUnknown = false;
+
+function save() {
+  localStorage.setItem('acfc_known', JSON.stringify([...knownSet]));
+  localStorage.setItem('acfc_unknown', JSON.stringify([...unknownSet]));
+}
+
+function updateStats() {
+  const total = deck.length;
+  const pos = currentIdx + 1;
+  document.getElementById('totalCount').textContent = WORDS.length;
+  document.getElementById('knownCount').textContent = knownSet.size;
+  document.getElementById('unknownCount').textContent = unknownSet.size;
+  document.getElementById('currentPos').textContent = pos + ' / ' + total;
+  document.getElementById('cardNum').textContent = pos + ' / ' + total;
+  document.getElementById('cardNumBack').textContent = pos + ' / ' + total;
+  const pct = total > 1 ? ((pos - 1) / (total - 1)) * 100 : 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function render() {
+  const wi = deck[currentIdx];
+  const w = WORDS[wi];
+  // Front
+  document.getElementById('frontPos').textContent = w.pos || 'word';
+  document.getElementById('frontWord').textContent = w.word;
+  document.getElementById('frontPron').textContent = w.pronunciation ? '/' + w.pronunciation + '/' : '';
+  // Back
+  document.getElementById('backDefEn').textContent = w.en_def || '';
+  document.getElementById('backDefKo').style.display = showKo ? 'block' : 'none';
+  document.getElementById('backDefKo').textContent = w.ko_def || '';
+  document.getElementById('backExEn').textContent = w.en_example || '';
+  document.getElementById('backExEn').style.display = w.en_example ? 'block' : 'none';
+  document.getElementById('backExKo').style.display = (showKo && w.ko_example) ? 'block' : 'none';
+  document.getElementById('backExKo').textContent = w.ko_example || '';
+  document.getElementById('backSyn').textContent = w.synonyms || '—';
+  document.getElementById('backAnt').textContent = w.antonyms || '—';
+  // Known/unknown state
+  const kb = document.getElementById('knownBtn');
+  const ub = document.getElementById('unknownBtn');
+  kb.classList.toggle('marked', knownSet.has(wi));
+  ub.classList.toggle('marked', unknownSet.has(wi));
+  updateStats();
+  updateWordGrid();
+  document.getElementById('prevBtn').disabled = currentIdx === 0;
+  document.getElementById('nextBtn').disabled = currentIdx === deck.length - 1;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card3d').classList.toggle('flipped', isFlipped);
+}
+
+function navigate(dir) {
+  const newIdx = currentIdx + dir;
+  if (newIdx < 0 || newIdx >= deck.length) return;
+  currentIdx = newIdx;
+  if (isFlipped) {
+    isFlipped = false;
+    document.getElementById('card3d').classList.remove('flipped');
+  }
+  render();
+}
+
+function markKnown() {
+  const wi = deck[currentIdx];
+  if (knownSet.has(wi)) { knownSet.delete(wi); }
+  else { knownSet.add(wi); unknownSet.delete(wi); }
+  save(); render();
+  showToast(knownSet.has(wi) ? '✅ 완벽해요!' : '↩ 취소됨');
+}
+
+function markUnknown() {
+  const wi = deck[currentIdx];
+  if (unknownSet.has(wi)) { unknownSet.delete(wi); }
+  else { unknownSet.add(wi); knownSet.delete(wi); }
+  save(); render();
+  showToast(unknownSet.has(wi) ? '📌 복습 목록에 추가!' : '↩ 취소됨');
+}
+
+function shuffleCards() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  currentIdx = 0; isFlipped = false;
+  document.getElementById('card3d').classList.remove('flipped');
+  render();
+  showToast('🔀 셔플 완료!');
+}
+
+function filterMode() {
+  filterUnknown = !filterUnknown;
+  const btn = document.querySelector('[onclick="filterMode()"]');
+  if (filterUnknown) {
+    const newDeck = [...Array(WORDS.length).keys()].filter(i => unknownSet.has(i));
+    if (newDeck.length === 0) { showToast('📌 아직 표시된 단어가 없어요!'); filterUnknown = false; return; }
+    deck = newDeck;
+    btn.classList.add('btn-active-green');
+    showToast('📌 모르는 단어만 보기 (' + deck.length + '개)');
+  } else {
+    deck = [...Array(WORDS.length).keys()];
+    btn.classList.remove('btn-active-green');
+    showToast('📋 전체 단어 보기');
+  }
+  currentIdx = 0; isFlipped = false;
+  document.getElementById('card3d').classList.remove('flipped');
+  render();
+}
+
+function toggleLang() {
+  showKo = !showKo;
+  document.getElementById('langBtn').textContent = showKo ? '🌏 KO·EN' : '🌐 EN Only';
+  render();
+}
+
+function resetAll() {
+  if (!confirm('모든 학습 기록을 리셋할까요?')) return;
+  knownSet.clear(); unknownSet.clear();
+  deck = [...Array(WORDS.length).keys()];
+  currentIdx = 0; isFlipped = false; filterUnknown = false;
+  document.getElementById('card3d').classList.remove('flipped');
+  document.querySelector('[onclick="filterMode()"]').classList.remove('btn-active-green');
+  save(); render();
+  showToast('🔄 초기화 완료!');
+}
+
+function toggleList() {
+  const p = document.getElementById('wordListPanel');
+  p.classList.toggle('open');
+}
+
+function updateWordGrid() {
+  const grid = document.getElementById('wordGrid');
+  const wi = deck[currentIdx];
+  grid.innerHTML = WORDS.map((w, i) => {
+    let cls = 'word-chip';
+    if (deck[currentIdx] === i) cls += ' current-chip';
+    else if (knownSet.has(i)) cls += ' known-chip';
+    else if (unknownSet.has(i)) cls += ' unknown-chip';
+    return '<div class="' + cls + '" onclick="jumpTo(' + i + ')">' + w.word + '</div>';
+  }).join('');
+}
+
+function jumpTo(wordIdx) {
+  const di = deck.indexOf(wordIdx);
+  if (di === -1) {
+    // If not in current deck, switch to full deck
+    deck = [...Array(WORDS.length).keys()];
+    filterUnknown = false;
+    document.querySelector('[onclick="filterMode()"]').classList.remove('btn-active-green');
+    currentIdx = wordIdx;
+  } else {
+    currentIdx = di;
+  }
+  isFlipped = false;
+  document.getElementById('card3d').classList.remove('flipped');
+  render();
+  document.getElementById('wordListPanel').classList.remove('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') navigate(-1);
+  else if (e.key === 'ArrowRight') navigate(1);
+  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'k') markKnown();
+  else if (e.key === 'u') markUnknown();
+});
+
+// Swipe support
+let touchStartX = 0;
+document.querySelector('.card-scene').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, {passive: true});
+document.querySelector('.card-scene').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) { navigate(dx < 0 ? 1 : -1); }
+  else { flipCard(); }
+}, {passive: true});
+
+// Init
+render();
+</script>
+</body>
+</html>
